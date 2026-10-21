@@ -1,0 +1,32 @@
+{
+  "moto": {
+    "class": "light",
+    "hp": 60,
+    "armor": 1,
+    "maxSpeed": 16,
+    "reverseFactor": 0.6,
+    "accelTime": 0.6,
+    "hullTurnRate": 140,
+    "turretTurnRate": 220
+  },
+  "m1": {
+    "class": "medium",
+    "hp": 100,
+    "armor": 3,
+    "maxSpeed": 11,
+    "reverseFactor": 0.5,
+    "accelTime": 1.0,
+    "hullTurnRate": 95,
+    "turretTurnRate": 160
+  },
+  "goliath": {
+    "class": "heavy",
+    "hp": 160,
+    "armor": 6,
+    "maxSpeed": 7,
+    "reverseFactor": 0.45,
+    "accelTime": 1.6,
+    "hullTurnRate": 60,
+    "turretTurnRate": 110
+  }
+}

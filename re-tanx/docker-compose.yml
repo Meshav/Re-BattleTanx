@@ -1,0 +1,11 @@
+# Phase 0: Caddy serves the built client. Build first: `npm ci && npm run build`.
+# Game server + MariaDB services are added in Phases 4 and 6.
+services:
+  web:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '8088:80'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./packages/client/dist:/srv:ro
