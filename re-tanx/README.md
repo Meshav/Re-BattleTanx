@@ -9,7 +9,7 @@ build order is `docs/11`, code shape is `docs/12`).
 npm ci
 npm run dev        # client at http://localhost:5173 — WASD drives the tank
 npm run ci         # lint + typecheck + test + build (what CI runs)
-npm run build && docker compose up -d   # static client via Caddy on :8088
+npm run build && docker compose up -d   # static client via Caddy on :38473
 ```
 
 ## Layout

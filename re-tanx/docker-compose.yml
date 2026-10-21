@@ -5,7 +5,7 @@ services:
     image: caddy:2-alpine
     restart: unless-stopped
     ports:
-      - '8088:80'
+      - '38473:80'
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./packages/client/dist:/srv:ro
