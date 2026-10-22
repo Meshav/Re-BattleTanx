@@ -10,7 +10,7 @@ export function showSettings(host: HTMLElement, onBack: () => void, onChange?: (
     <h1>SETTINGS</h1>
     <label>Sound effects <input type="range" name="volume" min="0" max="1" step="0.05" value="${s.volume}"></label>
     <label>Music <input type="range" name="musicVolume" min="0" max="1" step="0.05" value="${s.musicVolume}"></label>
-    <label>Graphics <select name="quality"><option value="high"${s.quality === "high" ? " selected" : ""}>High (shadows, antialiasing)</option><option value="low"${s.quality === "low" ? " selected" : ""}>Low — faster on phones / old laptops (reloads)</option></select></label>
+    <label>Graphics <select name="quality"><option value="low"${s.quality === "low" ? " selected" : ""}>Performance — fastest response (recommended)</option><option value="high"${s.quality === "high" ? " selected" : ""}>High detail — shadows and antialiasing</option></select><span class="muted">Changing graphics reloads the game when you press Done.</span></label>
     <label class="check"><input type="checkbox" name="colorblind"${s.colorblind ? " checked" : ""}> Colour-blind safe team colours</label>
     <label class="check"><input type="checkbox" name="reducedMotion"${s.reducedMotion ? " checked" : ""}> Reduce motion (no screen shake or flashes)</label>
     <h3>Keyboard</h3><div class="binds">${(Object.keys(LABEL) as Action[]).map((a) => `<span>${LABEL[a]}</span><button type="button" class="secondary small" data-bind="${a}">${keyName(s.bindings[a])}</button>`).join("")}</div>

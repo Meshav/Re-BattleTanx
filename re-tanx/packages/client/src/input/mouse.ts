@@ -4,17 +4,19 @@ export interface Mouse { px: number; py: number; ndcX: number; ndcY: number; lef
 
 export function createMouse(canvas: HTMLCanvasElement): Mouse {
   const m: Mouse = { px: 0, py: 0, ndcX: 0, ndcY: 0, left: false, right: false, clickedL: false, clickedR: false, moved: false };
-  canvas.addEventListener("pointermove", (e) => {
+  const position = (e: PointerEvent) => {
     const r = canvas.getBoundingClientRect();
     m.px = e.clientX - r.left;
     m.py = e.clientY - r.top;
     m.ndcX = ((e.clientX - r.left) / r.width) * 2 - 1;
     m.ndcY = -((e.clientY - r.top) / r.height) * 2 + 1;
     m.moved = true;
-  });
-  canvas.addEventListener("pointerdown", (e) => setButton(m, e.button, true));
+  };
+  canvas.addEventListener("pointermove", position);
+  canvas.addEventListener("pointerdown", (e) => { position(e); setButton(m, e.button, true); });
   window.addEventListener("pointerup", (e) => setButton(m, e.button, false));
   canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+  window.addEventListener("blur", () => { m.left = m.right = m.clickedL = m.clickedR = false; });
   return m;
 }
 

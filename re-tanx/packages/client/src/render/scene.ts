@@ -4,8 +4,8 @@ import { settings } from "../settings/settings.ts";
 /** One renderer for the page; each match builds a fresh scene. */
 export function createRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
   const low = settings().quality === "low";
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !low });
-  renderer.setPixelRatio(low ? 1 : Math.min(2, window.devicePixelRatio));
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !low, powerPreference: "high-performance" });
+  renderer.setPixelRatio(low ? 1 : Math.min(1.5, window.devicePixelRatio));
   renderer.shadowMap.enabled = !low;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   const resize = () => renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -24,7 +24,7 @@ export function createBattleScene(fog = 0): THREE.Scene {
   sun.position.set(40, 120, 60);
   sun.target.position.set(100, 0, 80);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.set(1024, 1024);
   sun.shadow.bias = -0.0005;
   sun.shadow.normalBias = 0.4;
   Object.assign(sun.shadow.camera, { left: -150, right: 150, top: 150, bottom: -150, far: 400 });
@@ -35,3 +35,19 @@ export function createBattleScene(fog = 0): THREE.Scene {
 /** Sim plane (x, y) → Three (x, h, y). Sim angle → Three yaw. */
 export const toThree = (x: number, y: number, h = 0): THREE.Vector3 => new THREE.Vector3(x, h, y);
 export const toYaw = (rot: number): number => -rot;
+
+/** Matches own their GPU allocations; release them before opening another arena. */
+export function disposeScene(scene: THREE.Scene): void {
+  const geometries = new Set<THREE.BufferGeometry>();
+  const materials = new Set<THREE.Material>();
+  scene.traverse((obj) => {
+    if (obj instanceof THREE.Mesh || obj instanceof THREE.Line) {
+      geometries.add(obj.geometry);
+      for (const mat of Array.isArray(obj.material) ? obj.material : [obj.material]) materials.add(mat);
+    }
+    if (obj instanceof THREE.InstancedMesh) obj.dispose();
+    if (obj instanceof THREE.DirectionalLight) obj.shadow.dispose();
+  });
+  for (const geo of geometries) geo.dispose();
+  for (const mat of materials) mat.dispose();
+}

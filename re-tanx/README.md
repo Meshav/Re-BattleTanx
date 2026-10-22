@@ -30,7 +30,8 @@ Keyboard bindings for P1 are rebindable in Settings. Hover tanks strafe with A/D
 ## What's in the game
 - **Campaign:** Acts I & II (24 missions), Scrap economy and deploy screen, wingmen, three-phase bosses, 1–2 player split-screen co-op. Progress saves in the browser.
 - **Modes:** Deathmatch, Annihilation, Tank Wars, Rookie, Oracle Raid (with rail cannon), Frenzy, Convoy, Keep Away, King of the Rubble, Horde, Last Gang Standing, Siege.
-- **Local match menu:** arena (5 built-in or your own from the map editor), mode, score limit, free-for-all or humans-vs-bots, 1–4 local players (split-screen), 0–7 bots, bot skill. Every match records a replay. `?quick` skips the menu with the last setup.
+- **Start menu:** **Play now** starts your last local setup immediately; **Campaign** and **Play online** explain their own routes. Open **Customize local match** for arena, mode, score limit, teams, 1–4 split-screen players and 0–7 bots. Replays and the map editor live in their own expandable section. Every match records a replay. `?quick` skips the menu with the last setup.
+- **Performance:** Settings → Graphics → **Performance** is the default for new settings, using native CSS resolution without shadows or antialiasing. **High detail** remains available and existing preferences are respected. Player movement is previewed every frame; simulation and replay rules remain at 30 Hz.
 - **Online:** Menu → **Play online** → **Quick match** (fullest open public lobby, or a new one; public lobbies auto-start after 30 s alone / 15 s with company / 3 s full), or host a lobby (5-letter code / invite link `?join=CODE`) or join one. Lobby options: arena, mode, bots, Public, Ranked (Glicko-2; leaderboard in the online menu). Leaving mid-match hands your tank to a bot; a dropped connection can come back for 60 s. Every online match is saved to match history.
 - **Progression:** levels 1–50, unlocks (gangs, tanks, perk slots, titles), perks, tank mastery, daily challenges. Guest progress is kept in the browser for local play; online, the server keeps your profile (guest token, optional Discord/Google sign-in) and awards XP itself.
 - **Map editor:** paint an arena in the browser, test it, save it, share it as a `?map=CODE` link, use it online. Guide: [docs/guides/14-map-authoring-guide.md](docs/guides/14-map-authoring-guide.md).
@@ -47,6 +48,8 @@ scripts/           check-rules.mjs, check-ip.mjs, gen-audio.mjs, build-act2.py, 
 ```
 Sim rules: `World` is plain data; `stepWorld` orders pure systems; systems emit `SimEvent`s that render/audio consume. Determinism is enforced (seeded RNG, quantized inputs), which is what makes replays bit-identical.
 Tech-debt ledger: `grep -rn "shortcut:" packages`.
+
+Brand assets live in `packages/client/public/branding/`: `logo-full.png` is the desktop menu logo, `logo-text.png` is the compact menu wordmark, and `icon.png` appears on the pause screen. The supplied black-background wordmark is retained as `logo-text-black.png`. The browser favicon is `packages/client/public/favicon.ico`.
 
 ## Audio
 All sounds are original placeholders, made from code by `node scripts/gen-audio.mjs` (music needs ffmpeg). They live in `packages/client/public/audio/`: 40 sound effects as `sfx/*.wav` and two music loops as `music/*.mp3`. To swap in a recorded sound, drop a file with the same name over the placeholder. Levels, pitch variation and the voice limit for each sound are set in `data/audio.json`. Event-to-sound mapping is in `packages/client/src/audio/sfx.ts`.

@@ -1,14 +1,15 @@
-import { quantizeInput, createWorld, mapById, parseMap, applySnapshot, rules, tankDefs, type MapJson, type ModeKind, type ServerMsg, type World } from "@re-tanx/sim";
+import { idleInput, quantizeInput, createWorld, mapById, parseMap, applySnapshot, rules, tankDefs, type MapJson, type ModeKind, type ServerMsg, type World } from "@re-tanx/sim";
 import type * as THREE from "three";
-import { createBattleScene, toThree } from "../render/scene.ts";
-import { capturePoses, createWorldView, fadeFor, onSimEvents, poseAt, renderWorld, syncViewerOnly, type Poses } from "../render/worldView.ts";
+import { createBattleScene, disposeScene, toThree } from "../render/scene.ts";
+import { capturePoses, createWorldView, fadeFor, onSimEvents, renderWorld, syncViewerOnly, type Poses } from "../render/worldView.ts";
+import { playerPose } from "../render/playerPose.ts";
 import { updateTankView } from "../render/views/tankView.ts";
 import { updateChaseCam } from "../render/camera/chaseCam.ts";
 import { addShake, shakeOffset } from "../render/fx/shake.ts";
 import { hudEvents, updateHud } from "../hud/hud.ts";
 import { playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
 import { startLoop } from "../loop.ts";
-import { createLocalPlayer, placePlayer, readInput, toggleCamera, wantsCameraToggle, type Devices, type LocalPlayer } from "../app/localPlayer.ts";
+import { anyPadStart, createLocalPlayer, peekInput, placePlayer, readInput, toggleCamera, wantsCameraToggle, type Devices, type LocalPlayer } from "../app/localPlayer.ts";
 import { cameraPose } from "../app/cameraPose.ts";
 import { createPauseMenu } from "../app/pauseMenu.ts";
 import { consumePress } from "../input/keyboard.ts";
@@ -34,8 +35,10 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
   const shake = { amount: 0 };
   const pause = createPauseMenu(host, { onQuit: () => { stop(); hooks.onLeave(); } }, "Menu", "Leave match");
   let player: LocalPlayer | undefined;
-  let snapPrev: Poses = new Map(), ownPrev: Poses = new Map();
+  let snapPrev: Poses = new Map();
   let lastSnapAt = performance.now(), rtt = 0, overShown = false, prevSnapTick = 0;
+  let stopped = false, resultsTimer: ReturnType<typeof setTimeout> | undefined;
+  let padStartWas = false;
   const layout = () => player && placePlayer(player, { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight }, false);
   window.addEventListener("resize", layout);
   const ping = setInterval(() => sock.send({ t: "ping", at: performance.now() }), 2000);
@@ -63,15 +66,14 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
     if (player) hudEvents(player.hud, m.events, mirror);
     if (mirror.mode.over && !overShown) {
       overShown = true;
-      setTimeout(() => hooks.onOver(mirror), 2000);
+      resultsTimer = setTimeout(() => hooks.onOver(mirror), 2000);
     }
   }
 
   const stopLoop = startLoop(1 / rules.tickRate, {
     step() {
-      if (!player || pause.open || mirror.mode.over) return;
-      ownPrev = capturePoses(mirror);
-      const input = quantizeInput(readInput(player, devices, mirror)); // same rounding the server applies
+      if (!player || mirror.mode.over) return;
+      const input = quantizeInput(pause.open ? idleInput(player.tank.turretRot) : readInput(player, devices, mirror));
       const seq = predict(pred, mirror, player.tank, input);
       // the tick other tanks are drawn at right now, so the server can rewind hitscan shots to what we saw
       const snapAlpha = Math.min(1, (performance.now() - lastSnapAt) / SNAP_MS);
@@ -79,19 +81,21 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
       sock.send({ t: "input", seq, input, view });
     },
     render(alpha, dt) {
-      if (consumePress(devices.kb, "Escape")) pause.toggle();
+      const start = anyPadStart();
+      if (consumePress(devices.kb, "Escape") || (start && !padStartWas)) pause.toggle();
+      padStartWas = start;
       const snapAlpha = Math.min(1, (performance.now() - lastSnapAt) / SNAP_MS);
       renderWorld(view, mirror, snapPrev, snapAlpha, dt);
       netEl.textContent = `${Math.round(rtt)} ms`;
       if (!player) return;
       if (wantsCameraToggle(player, devices)) toggleCamera(player);
       const own = view.tanks.get(player.tank.id);
-      const ownPose = poseAt(ownPrev, mirror, player.tank.id, alpha);
-      if (own && ownPose) updateTankView(own, player.tank, ownPose);
-      const pose = ownPose && cameraPose(mirror, ownPrev, player.tank, alpha);
-      if (pose) updateChaseCam(player.cam, player.camera, pose, dt, shakeOffset(shake, dt), tankDefs[player.tank.kind].radius);
+      const ownPose = playerPose(mirror, player.tank, peekInput(player, devices, mirror), pause.open ? 0 : alpha);
+      if (own) updateTankView(own, player.tank, ownPose);
+      const pose = cameraPose(mirror, snapPrev, player.tank, alpha, ownPose);
+      updateChaseCam(player.cam, player.camera, pose, dt, shakeOffset(shake, dt), tankDefs[player.tank.kind].radius);
       syncViewerOnly(view, mirror, player.tank);
-      if (pose) fadeFor(view, player.camera, toThree(pose.x, pose.y, 1.5));
+      fadeFor(view, player.camera, toThree(pose.x, pose.y, 1.5));
       updateHud(player.hud, player.tank, mirror);
       renderer.setScissorTest(false);
       renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
@@ -102,16 +106,22 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
   playMusic(sfx, "battle");
 
   function stop(): void {
+    if (stopped) return;
+    stopped = true;
     stopLoop();
     updateEngine(sfx, undefined);
     devices.touch?.el.remove();
     delete devices.touch;
     clearInterval(ping);
+    clearTimeout(resultsTimer);
     window.removeEventListener("resize", layout);
+    disposeScene(scene);
+    renderer.renderLists.dispose();
   }
 
   return {
     onServer(m) {
+      if (stopped) return;
       if (m.t === "snap") onSnap(m);
       if (m.t === "pong") rtt = performance.now() - m.at;
     },

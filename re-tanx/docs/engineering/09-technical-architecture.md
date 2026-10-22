@@ -9,7 +9,7 @@ TypeScript everywhere, Vite, Three.js, plain HTML/CSS UI, hand-rolled 2D collisi
 npm workspaces: `packages/sim` (pure simulation, no DOM/Node), `packages/client` (Vite + Three.js), `packages/server` (Node + ws, run with tsx). Data in `data/*.json`, SQL in `sql/schema.sql`, tooling in `scripts/`, these docs in `docs/`. Module maps: doc 12 §12.4.
 
 ## 9.3 Simulation
-- **Fixed 30 Hz** shared sim, rendered at display rate with interpolation.
+- **Fixed 30 Hz** shared sim, rendered at display rate. Other tanks interpolate; locally controlled tanks preview the fractional tick with live input on a copy of their state (including wall collision). Replays keep tick interpolation. Frame catch-up is capped at two steps and reset on tab visibility changes.
 - **World is plain data**; `stepWorld` is the only place systems are ordered. Systems emit `SimEvent`s that render, audio, HUD and net consume.
 - **Fully deterministic** given a seed and the inputs. Seeded RNG lives in the world; there's no `Math.random` or time in the sim. Inputs are quantized before the sim sees them. This is what makes replays (§9.11) bit-identical between browser, server and Node.
 - The same sim runs **locally** for single-player, split-screen and campaign: no server needed, playable offline as a static site.
@@ -21,7 +21,8 @@ npm workspaces: `packages/sim` (pure simulation, no DOM/Node), `packages/client`
   - **private** fields (your own heat, specials) only to the owner.
   - Structure stages and pickups only when changed. Events ride along.
   - ⏳ Binary encoding (only if JSON > 40 KB/s per client; not needed yet).
-- **Client prediction** of your own tank (the shared `moveTank`, including rail riding) with reconciliation on each snapshot's `ack`. **Interpolation** of everything else between the last two snapshots.
+- **Client prediction** of your own tank (the shared `moveTank`, including rail riding) with reconciliation on each snapshot's `ack`, plus the same per-frame visual preview used offline. **Interpolation** of other tanks between the last two snapshots.
+- **Input bursts:** the server consumes the newest movement each tick, preserving fire/special taps and the last cycle direction in the bounded burst. It acknowledges the newest sequence instead of carrying a backlog of old controls into later ticks. Online pause sends neutral controls so the server stops repeating the last held input.
 - **Lag compensation (hitscan)** ✅ *(S25)*:
   - The server keeps every tank's position for the last **8 ticks (~250 ms)** (`sim/systems/lagComp.ts`).
   - An instant-hit shot (machine gun, laser gun, laser special) is resolved with other tanks moved back to the shooter's `view` tick, then restored. Tanks that weren't on the field then can't be hit.

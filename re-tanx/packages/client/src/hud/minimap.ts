@@ -11,8 +11,10 @@ export function drawMinimap(canvas: HTMLCanvasElement, world: World, me: Tank): 
   if (!g) return;
   const { cols, rows, cell } = world.map;
   const s = SIZE / Math.max(cols, rows);
-  canvas.width = Math.ceil(cols * s);
-  canvas.height = Math.ceil(rows * s);
+  const width = Math.ceil(cols * s), height = Math.ceil(rows * s);
+  if (canvas.width !== width) canvas.width = width;
+  if (canvas.height !== height) canvas.height = height;
+  g.clearRect(0, 0, width, height);
   g.fillStyle = "rgba(20,20,16,.85)";
   g.fillRect(0, 0, canvas.width, canvas.height);
   g.fillStyle = "#2e5f7a";

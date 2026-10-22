@@ -12,6 +12,7 @@ export interface Hud {
   score: HTMLElement; center: HTMLElement; specials: HTMLElement; roster: HTMLElement;
   minimap: HTMLCanvasElement; feed: KillFeed; flash: HTMLElement; objective: HTMLElement; lastSpecials: string; lastRoster: string;
   heatBar: HTMLElement; heatFill: HTMLElement; status: HTMLElement; boss: HTMLElement; bossName: HTMLElement; bossFill: HTMLElement;
+  nextUpdate: number;
 }
 
 export function createHud(root: HTMLElement, names: (id: number) => string): Hud {
@@ -33,6 +34,7 @@ export function createHud(root: HTMLElement, names: (id: number) => string): Hud
     <div class="hud-flash" data-flash></div>`;
   const q = <T extends HTMLElement = HTMLElement>(s: string) => root.querySelector<T>(`[${s}]`)!;
   return {
+    nextUpdate: 0,
     hpFill: q("data-hp-fill"), hpBar: q("data-hp-bar"), hpText: q("data-hp-text"), shieldFill: q("data-shield-fill"),
     score: q("data-score"), center: q("data-center"), specials: q("data-specials"), roster: q("data-roster"),
     minimap: q<HTMLCanvasElement>("data-minimap"), feed: { el: q("data-feed"), lines: [], names }, flash: q("data-flash"), objective: q("data-objective"),
@@ -51,6 +53,9 @@ export function hudEvents(h: Hud, events: SimEvent[], world: World): void {
 }
 
 export function updateHud(h: Hud, me: Tank, world: World): void {
+  const now = performance.now();
+  if (now < h.nextUpdate) return;
+  h.nextUpdate = now + 50; // HUD/radar at 20 Hz; tank and camera still render every frame.
   const max = tankDefs[me.kind].hp;
   const pct = Math.max(0, me.hp / max);
   h.hpFill.style.width = `${pct * 100}%`;

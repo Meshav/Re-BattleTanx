@@ -41,7 +41,15 @@ export function placePlayer(p: LocalPlayer, rect: Rect, split: boolean): void {
 
 export interface Devices { kb: Keyboard; mouse: Mouse; touch?: Touch }
 
-export function readInput(p: LocalPlayer, d: Devices, world: World): InputState {
+/** Read live controls for rendering without consuming taps intended for the next sim tick. */
+export function peekInput(p: LocalPlayer, d: Devices, world: World): InputState {
+  return readInput(p, {
+    kb: { held: d.kb.held, pressed: new Set(d.kb.pressed) }, mouse: { ...d.mouse },
+    ...(d.touch ? { touch: { ...d.touch } } : {}),
+  }, world, true);
+}
+
+export function readInput(p: LocalPlayer, d: Devices, world: World, preview = false): InputState {
   if (p.device === "kbm") {
     d.mouse.moved = false;
     return arcadeInput(d.kb, d.mouse, p.tank, mouseGroundPoint(d.mouse, p.camera, p.rect));
@@ -49,9 +57,9 @@ export function readInput(p: LocalPlayer, d: Devices, world: World): InputState 
   if (p.device === "keys") return classicInput(d.kb, ARROW_KEYS, p.tank, world);
   if (p.device === "touch") return d.touch ? touchInput(d.touch, p.tank, p.cam.yaw) : classicInput(d.kb, ARROW_KEYS, p.tank, world);
   const pad = readPad(Number(p.device.slice(3)));
-  if (pad.back && !p.lastPad?.back) toggleCamera(p);
+  if (!preview && pad.back && !p.lastPad?.back) toggleCamera(p);
   const input = twinStickInput(pad, p.lastPad, p.tank, p.cam.yaw);
-  p.lastPad = pad;
+  if (!preview) p.lastPad = pad;
   return input;
 }
 
@@ -67,7 +75,7 @@ export function wantsCameraToggle(p: LocalPlayer, d: Devices): boolean {
 }
 
 /** Start on any connected pad (edge-detected by the caller). */
-export const anyPadStart = (): boolean => [0, 1, 2, 3].some((i) => readPad(i).start);
+export const anyPadStart = (): boolean => Array.from(navigator.getGamepads?.() ?? []).some((pad) => pad?.buttons[9]?.pressed);
 
 export const clearMouseClicks = (d: Devices): void => {
   takeButton(d.mouse, "L");

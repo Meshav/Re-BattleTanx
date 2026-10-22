@@ -4,7 +4,8 @@ How to run a Re-Tanx server for friends or a homelab. Everything here is built a
 
 ## 1. Quickest: Docker Compose
 ```bash
-git clone … && cd re-tanx
+git clone https://github.com/Meshav/Re-BattleTanx.git
+cd Re-BattleTanx/re-tanx
 docker compose up --build        # web on :24873 (client + proxy) + game server + MariaDB
 ```
 Open `http://<host>:24873`. Set `WEB_PORT` in `.env` if that host port is occupied. Three services start:
@@ -16,6 +17,37 @@ Open `http://<host>:24873`. Set `WEB_PORT` in `.env` if that host port is occupi
 | `db` | `mariadb:11` | Profiles, identities, match history. Tables are created on first boot from `sql/schema.sql` |
 
 The server image's build stage runs `npm run check` (rules, IP guard, typecheck, all tests), so a broken tree won't build. Base images are build args for mirrors or pinned digests: `--build-arg NODE_IMAGE=… --build-arg CADDY_IMAGE=…`.
+
+### Updating an existing instance
+
+Commit and push the changes you want to deploy to GitHub. On the instance (meho), run as the owner of the existing checkout, with access to GitHub and the Docker daemon:
+
+```bash
+cd /path/to/Re-BattleTanx
+git pull --ff-only   # first time only, to obtain update.sh
+bash update.sh       # subsequent updates need only this command
+```
+
+You can also invoke `bash /path/to/Re-BattleTanx/update.sh` from another directory. No host Node/npm installation is needed; compilation and tests run inside the existing Dockerfile. Docker must include a Compose plugin supporting `up --wait --wait-timeout`. Use the same Compose project/environment as the existing deployment; if you originally used a custom project name, supply it with `COMPOSE_PROJECT_NAME=your-name bash update.sh`.
+
+The script:
+1. Checks for local changes, an attached branch/upstream, Docker access, and another running update.
+2. Fetches the branch's configured remote and fast-forwards to its upstream. Ahead/diverged local commits stop the update; no reset or stash is performed.
+3. Validates Compose without printing resolved secrets, then builds `game` and `web` while existing containers keep running.
+4. Starts/checks `db` without recreating an existing database container, then recreates `game` and `web` and waits for readiness. [Compose recreation](https://docs.docker.com/reference/cli/docker/compose/up/) applies new images and configuration while retaining mounted volumes.
+5. Checks both the static website and `/health` through Caddy, then prints service status and the old/new Git revisions.
+
+Active matches disconnect during the application restart. The local `re-tanx/.env` and database volume are retained; `.env` files are excluded from Git and Docker build context. The script also rebuilds/restarts when Git is already current, so rerunning it can recover from a failed build or interrupted deployment.
+
+If Git or the build fails, the application restart does not run. Git may already be at the new revision; fix the reported issue and rerun `bash update.sh`. A restart or health-check failure exits with an error and requires inspection; the script does not automatically roll back images or database schema:
+
+```bash
+cd /path/to/Re-BattleTanx/re-tanx
+docker compose ps
+docker compose logs --tail=80 game web db
+```
+
+Normal exit and Ctrl+C release the update lock. If the process was forcibly killed, confirm no update is running before removing the `retanx-update.lock` directory under the checkout's Git directory. To test the updater locally without Docker or network access: `bash re-tanx/scripts/test-update.sh` from the repository root (the test uses temporary Git repos, mocked Docker, and Node for syntax checking).
 
 ## 2. Environment variables
 Set these in a `.env` next to `docker-compose.yml` (Compose reads it) or in your process manager.

@@ -12,14 +12,15 @@ export function arcadeInput(kb: Keyboard, mouse: Mouse, tank: Tank, aimPoint: Ve
   const b = settings().bindings;
   const side = axis(kb, [b.left], [b.right]);
   const hover = tankDefs[tank.kind].hover === true;
+  const fire = consumePress(kb, b.fire), special = consumePress(kb, b.special);
   return {
     throttle: axis(kb, [b.back], [b.forward]),
     // sim +rot turns toward +y, which is screen-right when the chase camera looks along the hull
     steer: hover ? faceAim(tank, aim) : side,
     strafe: hover ? side : 0,
     aim,
-    fire: takeButton(mouse, "L") || kb.held.has(b.fire) || consumePress(kb, b.fire),
-    special: takeButton(mouse, "R") || kb.held.has(b.special) || consumePress(kb, b.special),
+    fire: takeButton(mouse, "L") || kb.held.has(b.fire) || fire,
+    special: takeButton(mouse, "R") || kb.held.has(b.special) || special,
     cycle: (consumePress(kb, b.next) ? 1 : 0) - (consumePress(kb, b.prev) ? 1 : 0),
   };
 }

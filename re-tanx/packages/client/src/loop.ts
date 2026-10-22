@@ -1,6 +1,6 @@
 export interface LoopHooks { step(): void; render(alpha: number, frameDt: number): void }
 
-const MAX_FRAME = 0.25; // seconds; avoids a death spiral after a background tab resumes
+const MAX_STEPS = 2; // Yield to input/rendering instead of compounding a stalled frame.
 
 /** Fixed-timestep simulation with render interpolation. Returns a stop function. */
 export function startLoop(tickDt: number, hooks: LoopHooks): () => void {
@@ -9,7 +9,7 @@ export function startLoop(tickDt: number, hooks: LoopHooks): () => void {
   let last = performance.now();
   const frame = (now: number) => {
     if (!running) return;
-    const frameDt = Math.min(MAX_FRAME, (now - last) / 1000);
+    const frameDt = Math.max(0, Math.min(tickDt * MAX_STEPS, (now - last) / 1000));
     last = now;
     acc += frameDt;
     while (acc >= tickDt) {
@@ -17,10 +17,14 @@ export function startLoop(tickDt: number, hooks: LoopHooks): () => void {
       acc -= tickDt;
     }
     hooks.render(acc / tickDt, frameDt);
-    requestAnimationFrame(frame);
+    if (running) frameId = requestAnimationFrame(frame);
   };
-  requestAnimationFrame(frame);
+  let frameId = requestAnimationFrame(frame);
+  const reset = () => { acc = 0; last = performance.now(); };
+  document.addEventListener("visibilitychange", reset);
   return () => {
     running = false;
+    cancelAnimationFrame(frameId);
+    document.removeEventListener("visibilitychange", reset);
   };
 }

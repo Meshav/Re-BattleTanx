@@ -16,7 +16,7 @@ export const DEFAULT_BINDINGS: Record<Action, string> = {
 
 const KEY = "re-tanx:settings";
 const prefersReduced = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-const defaults = (): Settings => ({ volume: 0.8, musicVolume: 0.6, quality: "high", colorblind: false, reducedMotion: prefersReduced(), bindings: { ...DEFAULT_BINDINGS } });
+const defaults = (): Settings => ({ volume: 0.8, musicVolume: 0.6, quality: "low", colorblind: false, reducedMotion: prefersReduced(), bindings: { ...DEFAULT_BINDINGS } });
 
 let current: Settings | undefined;
 

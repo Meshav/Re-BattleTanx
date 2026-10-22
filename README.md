@@ -18,4 +18,14 @@ npm run server     # game server for online play, :8787
 npm run check      # rules + IP guard + typecheck + tests
 ```
 
+## Update the hosted instance
+
+On the Docker Compose host, from the **repository root**:
+```bash
+bash update.sh
+```
+The script fetches the current branch's upstream, fast-forwards, builds the update, restarts `game` and `web`, and checks the website and game health. It keeps the database volume and local `.env`; builds finish before the running application is restarted. Active matches disconnect during the restart.
+
+Changes must be committed and pushed to GitHub first. On the first run, use `git pull --ff-only` to obtain the script. Details and recovery: [self-hosting guide](re-tanx/docs/guides/self-hosting.md#updating-an-existing-instance).
+
 Fan project, non-commercial, no ripped assets. See the legal note in [`re-tanx/docs/README.md`](re-tanx/docs/README.md#legal--ip-note-read-first).

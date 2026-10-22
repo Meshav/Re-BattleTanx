@@ -1,6 +1,6 @@
 import { createRecorder, createWorld, parseMap, quantizeInput, rules, stepWorld, tankDefs, type Playback, type Recorder, type Replay, type SimEvent, type World } from "@re-tanx/sim";
 import type * as THREE from "three";
-import { createBattleScene, toThree } from "../render/scene.ts";
+import { createBattleScene, disposeScene, toThree } from "../render/scene.ts";
 import { capturePoses, createWorldView, fadeFor, onSimEvents, renderWorld, syncViewerOnly } from "../render/worldView.ts";
 import { updateChaseCam } from "../render/camera/chaseCam.ts";
 import { addShake, shakeOffset } from "../render/fx/shake.ts";
@@ -9,7 +9,9 @@ import { hudEvents, updateHud } from "../hud/hud.ts";
 import { playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
 import { startLoop } from "../loop.ts";
 import { toSlots, type Device, type MatchConfig } from "./matchConfig.ts";
-import { anyPadStart, clearMouseClicks, createLocalPlayer, placePlayer, readInput, toggleCamera, wantsCameraToggle, type Devices, type LocalPlayer } from "./localPlayer.ts";
+import { anyPadStart, clearMouseClicks, createLocalPlayer, peekInput, placePlayer, readInput, toggleCamera, wantsCameraToggle, type Devices, type LocalPlayer } from "./localPlayer.ts";
+import { playerPose } from "../render/playerPose.ts";
+import type { Pose } from "../render/views/tankView.ts";
 import { cameraPose } from "./cameraPose.ts";
 import { createPauseMenu } from "./pauseMenu.ts";
 import { consumePress } from "../input/keyboard.ts";
@@ -62,6 +64,7 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
   let overAt = 0;
   let padStartWas = false;
   let speed = 1;
+  let stopped = false;
   const banner = opts.playback ? replayBanner(hudHost) : undefined;
   Object.assign(window, { reTanx: { world, me: players[0]?.tank, players } });
 
@@ -87,11 +90,14 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
       const start = anyPadStart();
       if (consumePress(devices.kb, "Escape") || (start && !padStartWas)) pause.toggle();
       padStartWas = start;
+      if (pause.open) alpha = 1;
       if (opts.playback) replayKeys();
       for (const p of players) if (wantsCameraToggle(p, devices)) toggleCamera(p);
-      renderWorld(view, world, prev, alpha, dt);
+      const poses = opts.playback ? undefined : new Map(players.map((p) => [p.tank.id,
+        playerPose(world, p.tank, peekInput(p, devices, world), pause.open ? 0 : alpha)]));
+      renderWorld(view, world, prev, alpha, dt, poses);
       const sh = shakeOffset(shake, dt);
-      for (const p of players) drawViewport(p, alpha, dt, sh);
+      for (const p of players) drawViewport(p, alpha, dt, sh, poses?.get(p.tank.id));
       if (overAt && performance.now() - overAt > 2500) {
         stop();
         hooks.onOver(world);
@@ -121,8 +127,8 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
     banner!.textContent = `REPLAY · ${speed}× · watching ${p.tank.name} — Tab: next tank · 1/2/3: speed · Esc: menu`;
   }
 
-  function drawViewport(p: LocalPlayer, alpha: number, dt: number, sh: { x: number; y: number }): void {
-    const pose = cameraPose(world, prev, p.tank, alpha);
+  function drawViewport(p: LocalPlayer, alpha: number, dt: number, sh: { x: number; y: number }, own?: Pose): void {
+    const pose = cameraPose(world, prev, p.tank, alpha, own);
     updateChaseCam(p.cam, p.camera, pose, dt, players.length === 1 ? sh : { x: 0, y: 0 }, tankDefs[p.tank.kind].radius);
     syncViewerOnly(view, world, p.tank);
     fadeFor(view, p.camera, toThree(pose.x, pose.y, 1.5));
@@ -136,12 +142,16 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
   }
 
   function stop(): void {
+    if (stopped) return;
+    stopped = true;
     stopLoop();
     updateEngine(sfx, undefined);
     devices.touch?.el.remove();
     delete devices.touch;
     window.removeEventListener("resize", layout);
     renderer.setScissorTest(false);
+    disposeScene(scene);
+    renderer.renderLists.dispose();
   }
   return stop;
 }

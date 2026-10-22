@@ -63,7 +63,7 @@ export function poseAt(prev: Poses, world: World, id: number, alpha: number): Po
   return { x: lerp(p.x, cur.x, alpha), y: lerp(p.y, cur.y, alpha), rot: lerpAngle(p.rot, cur.rot, alpha), turretRot: lerpAngle(p.turretRot, cur.turretRot, alpha) };
 }
 
-export function renderWorld(v: WorldView, world: World, prev: Poses, alpha: number, dt: number): void {
+export function renderWorld(v: WorldView, world: World, prev: Poses, alpha: number, dt: number, players?: Poses): void {
   for (const t of world.tanks) {
     let tv = v.tanks.get(t.id);
     if (tv && tv.kind !== t.kind) {
@@ -75,7 +75,7 @@ export function renderWorld(v: WorldView, world: World, prev: Poses, alpha: numb
       v.tanks.set(t.id, tv);
       v.root.add(tv.root);
     }
-    updateTankView(tv, t, poseAt(prev, world, t.id, alpha)!);
+    updateTankView(tv, t, players?.get(t.id) ?? poseAt(prev, world, t.id, alpha)!);
   }
   syncStructures(v.structures, world);
   syncProjectiles(v.projectiles, world, v.root);
