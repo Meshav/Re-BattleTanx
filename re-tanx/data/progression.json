@@ -1,0 +1,225 @@
+{
+  "maxLevel": 50,
+  "curve": {
+    "base": 500,
+    "perLevel": 150
+  },
+  "xp": {
+    "kill": 50,
+    "objective": 100,
+    "matchComplete": 150,
+    "win": 100,
+    "campaignMission": 300,
+    "grade": {
+      "S": 300,
+      "A": 200,
+      "B": 100,
+      "C": 0
+    },
+    "firstWinOfDay": 500,
+    "botOnlyFactor": 0.5
+  },
+  "unlocks": {
+    "1": [
+      "gang:ironHounds",
+      "gang:boneRiders",
+      "gang:atomicPaladins",
+      "tank:m1",
+      "tank:moto",
+      "tank:goliath"
+    ],
+    "3": [
+      "gang:rustSaints",
+      "perkSlot"
+    ],
+    "5": [
+      "tank:hover",
+      "gang:faultline"
+    ],
+    "8": [
+      "gang:echoCompany",
+      "tank:sentinel",
+      "tank:rattler"
+    ],
+    "10": [
+      "perkSlot",
+      "title:Oracle Raid",
+      "tank:inferno"
+    ],
+    "12": [
+      "gang:blackHalos",
+      "tank:flpe"
+    ],
+    "15": [
+      "gang:madBattalion"
+    ],
+    "18": [
+      "tank:rhino"
+    ],
+    "20": [
+      "gang:gearFiends",
+      "perkSlot"
+    ],
+    "25": [
+      "gang:queensGuard",
+      "title:Warlord"
+    ],
+    "30": [
+      "gang:edgeborn",
+      "title:Riftborn"
+    ],
+    "40": [
+      "title:Tank Saint"
+    ],
+    "50": [
+      "title:Legend of the Long Road"
+    ]
+  },
+  "mastery": [
+    0,
+    5,
+    15,
+    30,
+    50,
+    75,
+    105,
+    140,
+    180,
+    225
+  ],
+  "challenges": {
+    "perDay": 3,
+    "pool": [
+      {
+        "id": "kills20",
+        "label": "Destroy 20 tanks",
+        "stat": "kills",
+        "target": 20,
+        "xp": 400
+      },
+      {
+        "id": "struct25",
+        "label": "Flatten 25 structures",
+        "stat": "structures",
+        "target": 25,
+        "xp": 300
+      },
+      {
+        "id": "matches3",
+        "label": "Finish 3 matches",
+        "stat": "matches",
+        "target": 3,
+        "xp": 300
+      },
+      {
+        "id": "wins2",
+        "label": "Win 2 matches",
+        "stat": "wins",
+        "target": 2,
+        "xp": 500
+      },
+      {
+        "id": "queens3",
+        "label": "Capture 3 Oracles",
+        "stat": "queens",
+        "target": 3,
+        "xp": 600
+      },
+      {
+        "id": "specials15",
+        "label": "Use 15 specials",
+        "stat": "specials",
+        "target": 15,
+        "xp": 300
+      },
+      {
+        "id": "pickups20",
+        "label": "Grab 20 crates",
+        "stat": "pickups",
+        "target": 20,
+        "xp": 200
+      },
+      {
+        "id": "missions2",
+        "label": "Complete 2 campaign missions",
+        "stat": "missions",
+        "target": 2,
+        "xp": 600
+      }
+    ]
+  },
+  "perks": {
+    "scavenger": {
+      "name": "Scavenger",
+      "up": "Stars give +1 extra special",
+      "down": "−10% max HP",
+      "mods": {
+        "starBonus": 1,
+        "maxHp": 0.9
+      }
+    },
+    "treads": {
+      "name": "Reinforced Treads",
+      "up": "+20% ram damage",
+      "down": "−5% speed",
+      "mods": {
+        "ram": 1.2,
+        "speed": 0.95
+      }
+    },
+    "quickLoader": {
+      "name": "Quick Loader",
+      "up": "+12% main gun fire rate",
+      "down": "−15% special capacity",
+      "mods": {
+        "fireRate": 1.12,
+        "specialMax": 0.85
+      }
+    },
+    "fieldMedic": {
+      "name": "Field Medic",
+      "up": "Health pickups +30%",
+      "down": "Shield pickups −30%",
+      "mods": {
+        "healthPickup": 1.3,
+        "shieldPickup": 0.7
+      }
+    },
+    "ghostEngine": {
+      "name": "Ghost Engine",
+      "up": "Bots hear you at half range",
+      "down": "−10% armor",
+      "mods": {
+        "hearing": 0.5,
+        "armor": 0.9
+      }
+    },
+    "demolitionist": {
+      "name": "Demolitionist",
+      "up": "+50% damage to structures",
+      "down": "−10% damage to tanks",
+      "mods": {
+        "structureDmg": 1.5,
+        "tankDmg": 0.9
+      }
+    },
+    "lastStand": {
+      "name": "Last Stand",
+      "up": "+25% damage below 20% HP",
+      "down": "+10% damage taken",
+      "mods": {
+        "lowHpDmg": 1.25,
+        "damageTaken": 1.1
+      }
+    },
+    "queensChampion": {
+      "name": "Oracle's Champion",
+      "up": "+10% speed carrying a Oracle",
+      "down": "−5% max HP",
+      "mods": {
+        "carrySpeed": 1.1,
+        "maxHp": 0.95
+      }
+    }
+  }
+}

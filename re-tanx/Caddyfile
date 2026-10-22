@@ -1,6 +1,24 @@
-:80 {
-	root * /srv
-	encode gzip
-	try_files {path} /index.html
-	file_server
+# SITE_ADDRESS=":8080" for plain HTTP behind another proxy, or "game.example.com" for automatic HTTPS.
+{$SITE_ADDRESS::8080} {
+	encode gzip zstd
+	handle /ws* {
+		reverse_proxy game:8787
+	}
+	handle /auth/* {
+		reverse_proxy game:8787
+	}
+	handle /history {
+		reverse_proxy game:8787
+	}
+	handle /leaderboard {
+		reverse_proxy game:8787
+	}
+	handle /health {
+		reverse_proxy game:8787
+	}
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
 }

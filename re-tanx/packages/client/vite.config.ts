@@ -1,6 +1,10 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  // data/ sits above the package; Vite must be allowed to serve it.
-  server: { fs: { allow: ['../..'] } },
+  server: {
+    host: true,
+    fs: { allow: ["../.."] },
+    proxy: { "/ws": { target: "ws://localhost:8787", ws: true }, "/auth": "http://localhost:8787", "/leaderboard": "http://localhost:8787", "/history": "http://localhost:8787" },
+  },
+  build: { target: "es2022", chunkSizeWarningLimit: 900 },
 });

@@ -1,0 +1,128 @@
+{
+  "guided": {
+    "max": 3,
+    "cooldown": 0.6,
+    "damage": 60,
+    "splash": 4,
+    "speed": 28,
+    "fuel": 8,
+    "turnRate": 150,
+    "super": {
+      "threshold": 3,
+      "damageMul": 3,
+      "splashMul": 1.6
+    }
+  },
+  "swarm": {
+    "max": 12,
+    "cooldown": 0.8,
+    "perShot": 4,
+    "damage": 12,
+    "splash": 1.5,
+    "speed": 34,
+    "fuel": 3,
+    "turnRate": 220,
+    "seekRange": 60,
+    "seekCone": 70,
+    "super": {
+      "threshold": 8,
+      "perShot": 16
+    }
+  },
+  "mine": {
+    "max": 6,
+    "cooldown": 0.4,
+    "damage": 50,
+    "splash": 3,
+    "armTime": 1,
+    "triggerRadius": 2.5,
+    "hiddenBeyond": 8,
+    "super": {
+      "threshold": 6,
+      "ringRadius": 7
+    }
+  },
+  "nuke": {
+    "max": 1,
+    "cooldown": 1,
+    "fuse": 5,
+    "damage": 150,
+    "edgeDamage": 20,
+    "radius": 300,
+    "flattenRadius": 40
+  },
+  "health": {
+    "max": 3,
+    "cooldown": 0.5,
+    "heal": 50
+  },
+  "laser": {
+    "max": 4,
+    "cooldown": 0.6,
+    "damage": 50,
+    "range": 80,
+    "super": {
+      "threshold": 4,
+      "damageMul": 1.5
+    }
+  },
+  "plasma": {
+    "max": 4,
+    "cooldown": 0.8,
+    "damage": 40,
+    "splash": 6,
+    "speed": 24,
+    "range": 75,
+    "super": {
+      "threshold": 4,
+      "bolts": 3
+    }
+  },
+  "turret": {
+    "max": 2,
+    "cooldown": 1,
+    "hp": 60,
+    "life": 30,
+    "damage": 2.5,
+    "rate": 0.25,
+    "range": 35
+  },
+  "shock": {
+    "max": 2,
+    "cooldown": 1,
+    "damage": 30,
+    "radius": 15,
+    "knockback": 14
+  },
+  "edge": {
+    "max": 1,
+    "cooldown": 1,
+    "damage": 25,
+    "radius": 18,
+    "knockback": 20,
+    "stun": 1.5
+  },
+  "cloak": {
+    "max": 2,
+    "cooldown": 1,
+    "duration": 12,
+    "revealRange": 10
+  },
+  "speed": {
+    "max": 2,
+    "cooldown": 0.5,
+    "duration": 8,
+    "factor": 1.4
+  },
+  "teleport": {
+    "max": 2,
+    "cooldown": 0.5,
+    "distance": 20
+  },
+  "repair": {
+    "max": 2,
+    "cooldown": 1,
+    "duration": 6,
+    "hps": 10
+  }
+}

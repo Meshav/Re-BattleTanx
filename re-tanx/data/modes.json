@@ -1,0 +1,150 @@
+{
+  "deathmatch": {
+    "scoreLimit": 7,
+    "timeLimit": 0
+  },
+  "annihilation": {
+    "scoreLimit": 0,
+    "timeLimit": 0
+  },
+  "tankWars": {
+    "scoreLimit": 0,
+    "timeLimit": 180
+  },
+  "family": {
+    "scoreLimit": 5,
+    "timeLimit": 0,
+    "damageScale": 0.6,
+    "allowCycle": false
+  },
+  "battlelord": {
+    "scoreLimit": 0,
+    "timeLimit": 0,
+    "queensPerTeam": 3,
+    "returnAfter": 20,
+    "rail": {
+      "halfCells": 4,
+      "mountSeconds": 0.8,
+      "mountRange": 3,
+      "dismountSeconds": 0.5,
+      "speed": 9,
+      "damageTaken": 0.6,
+      "gun": {
+        "kind": "shell",
+        "damage": 55,
+        "cooldown": 1.2,
+        "range": 85,
+        "speed": 55,
+        "splash": 3
+      }
+    }
+  },
+  "frenzy": {
+    "scoreLimit": 10,
+    "timeLimit": 0,
+    "returnAfter": 20
+  },
+  "holdEm": {
+    "scoreLimit": 60,
+    "timeLimit": 0,
+    "carrySpeed": 0.85,
+    "pointsPerSecond": 1,
+    "returnAfter": 20
+  },
+  "queen": {
+    "touchRadius": 4,
+    "fortressRadius": 9,
+    "carrySpeed": 1
+  },
+  "campaign": {
+    "scoreLimit": 0,
+    "timeLimit": 0
+  },
+  "koth": {
+    "scoreLimit": 100,
+    "timeLimit": 0,
+    "radius": 12,
+    "moveEvery": 60,
+    "pointsPerSecond": 1
+  },
+  "horde": {
+    "scoreLimit": 15,
+    "timeLimit": 0,
+    "lives": 5,
+    "lifePerBoss": 1,
+    "breakSeconds": 6,
+    "bossEvery": 5,
+    "budget": {
+      "base": 10,
+      "perWave": 6,
+      "playerExp": 0.8
+    },
+    "cost": {
+      "light": 1,
+      "medium": 2,
+      "heavy": 3,
+      "special": 3
+    },
+    "pool": {
+      "light": [
+        "moto",
+        "rattler"
+      ],
+      "medium": [
+        "m1",
+        "inferno"
+      ],
+      "heavy": [
+        "goliath",
+        "rhino"
+      ],
+      "special": [
+        "hover",
+        "flpe",
+        "sentinel"
+      ]
+    },
+    "boss": [
+      "rhino",
+      "rhino"
+    ],
+    "difficultyByWave": [
+      [
+        1,
+        "easy"
+      ],
+      [
+        4,
+        "normal"
+      ],
+      [
+        9,
+        "hard"
+      ],
+      [
+        14,
+        "battlelord"
+      ]
+    ]
+  },
+  "lastGang": {
+    "scoreLimit": 3,
+    "timeLimit": 0,
+    "roundBreak": 4
+  },
+  "siege": {
+    "scoreLimit": 0,
+    "timeLimit": 240,
+    "coreHp": 2500,
+    "defendRadius": 25
+  },
+  "convoy": {
+    "scoreLimit": 0,
+    "timeLimit": 0,
+    "trucks": 3,
+    "spacing": 12,
+    "escortRange": 25,
+    "roundSeconds": 150,
+    "deliverRange": 7
+  }
+}

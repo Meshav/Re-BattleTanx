@@ -1,43 +1,26 @@
-import { stepWorld, TICK_DT, type EntityId, type Inputs, type World } from '@re-tanx/sim';
+export interface LoopHooks { step(): void; render(alpha: number, frameDt: number): void }
 
-export interface Pose {
-  x: number;
-  y: number;
-  heading: number;
-}
+const MAX_FRAME = 0.25; // seconds; avoids a death spiral after a background tab resumes
 
-export interface LoopHooks {
-  isRunning(): boolean;
-  readInputs(): Inputs;
-  render(prev: ReadonlyMap<EntityId, Pose>, alpha: number): void;
-}
-
-/** Fixed-step sim at TICK_RATE; render at display rate, interpolating from the previous tick. */
-export function startLoop(world: World, hooks: LoopHooks): () => void {
-  let prev = snapshotPoses(world);
-  let accumulator = 0;
+/** Fixed-timestep simulation with render interpolation. Returns a stop function. */
+export function startLoop(tickDt: number, hooks: LoopHooks): () => void {
+  let acc = 0;
+  let running = true;
   let last = performance.now();
-  let frameId: number;
-
-  function frame(now: number): void {
-    const running = hooks.isRunning();
-    accumulator = running ? accumulator + Math.min((now - last) / 1000, 0.25) : 0;
+  const frame = (now: number) => {
+    if (!running) return;
+    const frameDt = Math.min(MAX_FRAME, (now - last) / 1000);
     last = now;
-    if (!running) prev = snapshotPoses(world);
-
-    while (accumulator >= TICK_DT) {
-      prev = snapshotPoses(world);
-      stepWorld(world, hooks.readInputs(), TICK_DT);
-      accumulator -= TICK_DT;
+    acc += frameDt;
+    while (acc >= tickDt) {
+      hooks.step();
+      acc -= tickDt;
     }
-
-    hooks.render(prev, running ? accumulator / TICK_DT : 1);
-    frameId = requestAnimationFrame(frame);
-  }
-  frameId = requestAnimationFrame(frame);
-  return () => cancelAnimationFrame(frameId);
-}
-
-function snapshotPoses(world: World): Map<EntityId, Pose> {
-  return new Map(world.tanks.map((t) => [t.id, { x: t.x, y: t.y, heading: t.heading }]));
+    hooks.render(acc / tickDt, frameDt);
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+  return () => {
+    running = false;
+  };
 }

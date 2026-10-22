@@ -1,43 +1,37 @@
-import * as THREE from 'three';
-import ground from '../../../../data/training-ground.json';
+import * as THREE from "three";
+import { settings } from "../settings/settings.ts";
 
-export interface Scene {
-  scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
-  render(): void;
+/** One renderer for the page; each match builds a fresh scene. */
+export function createRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
+  const low = settings().quality === "low";
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !low });
+  renderer.setPixelRatio(low ? 1 : Math.min(2, window.devicePixelRatio));
+  renderer.shadowMap.enabled = !low;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  const resize = () => renderer.setSize(window.innerWidth, window.innerHeight, false);
+  window.addEventListener("resize", resize);
+  resize();
+  return renderer;
 }
 
-export function createScene(): Scene {
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.domElement.setAttribute('aria-label', 'Training ground game view');
-  document.body.appendChild(renderer.domElement);
-
+/** fog 0..1 pulls the fog in (campaign weather); 0 = the normal haze. */
+export function createBattleScene(fog = 0): THREE.Scene {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x202830);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x334433, 1.2));
-  scene.add(
-    groundPlane(),
-    new THREE.GridHelper(ground.size, ground.size / ground.gridSpacing, 0x446644, 0x335533),
-  );
-
-  const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 500);
-  addEventListener('resize', () => {
-    camera.aspect = innerWidth / innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.render(scene, camera);
-  });
-
-  return { scene, camera, render: () => renderer.render(scene, camera) };
+  scene.background = new THREE.Color(0x8a8f86);
+  scene.fog = new THREE.Fog(0x8a8f86, 90 - fog * 75, 220 - fog * 170);
+  scene.add(new THREE.HemisphereLight(0xfff4e0, 0x3a3328, 1.4));
+  const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+  sun.position.set(40, 120, 60);
+  sun.target.position.set(100, 0, 80);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.0005;
+  sun.shadow.normalBias = 0.4;
+  Object.assign(sun.shadow.camera, { left: -150, right: 150, top: 150, bottom: -150, far: 400 });
+  scene.add(sun, sun.target);
+  return scene;
 }
 
-function groundPlane(): THREE.Mesh {
-  const mesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(ground.size, ground.size),
-    new THREE.MeshLambertMaterial({ color: 0x3a4a3a }),
-  );
-  mesh.rotation.x = -Math.PI / 2;
-  return mesh;
-}
+/** Sim plane (x, y) → Three (x, h, y). Sim angle → Three yaw. */
+export const toThree = (x: number, y: number, h = 0): THREE.Vector3 => new THREE.Vector3(x, h, y);
+export const toYaw = (rot: number): number => -rot;

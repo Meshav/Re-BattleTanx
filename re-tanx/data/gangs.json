@@ -1,0 +1,125 @@
+{
+  "ironHounds": {
+    "name": "Iron Hounds",
+    "roster": [
+      "m1",
+      "m1",
+      "m1",
+      "goliath",
+      "hover"
+    ],
+    "signature": "random"
+  },
+  "atomicPaladins": {
+    "name": "Atomic Paladins",
+    "roster": [
+      "goliath",
+      "goliath",
+      "m1",
+      "m1",
+      "rhino"
+    ],
+    "signature": "nuke",
+    "signatureOncePerMatch": true
+  },
+  "boneRiders": {
+    "name": "Bone Riders",
+    "roster": [
+      "moto",
+      "moto",
+      "moto",
+      "rattler",
+      "rattler"
+    ],
+    "signature": "speed"
+  },
+  "faultline": {
+    "name": "Faultline",
+    "roster": [
+      "m1",
+      "m1",
+      "rhino",
+      "goliath",
+      "goliath"
+    ],
+    "signature": "shock"
+  },
+  "rustSaints": {
+    "name": "Rust Saints",
+    "roster": [
+      "inferno",
+      "inferno",
+      "m1",
+      "m1",
+      "moto"
+    ],
+    "signature": "mine"
+  },
+  "echoCompany": {
+    "name": "Echo Company",
+    "roster": [
+      "m1",
+      "m1",
+      "sentinel",
+      "goliath",
+      "rattler"
+    ],
+    "signature": "turret"
+  },
+  "blackHalos": {
+    "name": "Black Halos",
+    "roster": [
+      "hover",
+      "hover",
+      "flpe",
+      "flpe",
+      "moto"
+    ],
+    "signature": "cloak"
+  },
+  "gearFiends": {
+    "name": "Gear Fiends",
+    "roster": [
+      "rhino",
+      "rhino",
+      "inferno",
+      "goliath",
+      "goliath"
+    ],
+    "signature": "repair"
+  },
+  "madBattalion": {
+    "name": "Mad Battalion",
+    "roster": [
+      "moto",
+      "moto",
+      "inferno",
+      "inferno",
+      "rattler"
+    ],
+    "signature": "swarm"
+  },
+  "queensGuard": {
+    "name": "Queen's Guard",
+    "roster": [
+      "flpe",
+      "flpe",
+      "moto",
+      "rattler",
+      "rhino"
+    ],
+    "signature": "guided"
+  },
+  "edgeborn": {
+    "name": "Riftborn",
+    "roster": [
+      "sentinel",
+      "sentinel",
+      "flpe",
+      "hover",
+      "goliath"
+    ],
+    "signature": "edge",
+    "hidden": true
+  }
+}

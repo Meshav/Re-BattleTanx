@@ -3,30 +3,235 @@
     "class": "light",
     "hp": 60,
     "armor": 1,
-    "maxSpeed": 16,
-    "reverseFactor": 0.6,
+    "radius": 1.8,
+    "speed": 16,
+    "reverse": 0.6,
     "accelTime": 0.6,
-    "hullTurnRate": 140,
-    "turretTurnRate": 220
+    "turnRate": 140,
+    "turretRate": 220,
+    "gun": {
+      "kind": "hitscan",
+      "damage": 5,
+      "cooldown": 0.166,
+      "range": 45,
+      "speed": 0,
+      "splash": 0
+    },
+    "cost": 5
   },
   "m1": {
     "class": "medium",
     "hp": 100,
     "armor": 3,
-    "maxSpeed": 11,
-    "reverseFactor": 0.5,
+    "radius": 2.4,
+    "speed": 11,
+    "reverse": 0.5,
     "accelTime": 1.0,
-    "hullTurnRate": 95,
-    "turretTurnRate": 160
+    "turnRate": 95,
+    "turretRate": 160,
+    "gun": {
+      "kind": "shell",
+      "damage": 25,
+      "cooldown": 1.0,
+      "range": 70,
+      "speed": 60,
+      "splash": 0
+    },
+    "cost": 10
   },
   "goliath": {
     "class": "heavy",
     "hp": 160,
     "armor": 6,
-    "maxSpeed": 7,
-    "reverseFactor": 0.45,
+    "radius": 3.0,
+    "speed": 7,
+    "reverse": 0.45,
     "accelTime": 1.6,
-    "hullTurnRate": 60,
-    "turretTurnRate": 110
+    "turnRate": 60,
+    "turretRate": 110,
+    "gun": {
+      "kind": "shell",
+      "damage": 45,
+      "cooldown": 1.6,
+      "range": 75,
+      "speed": 50,
+      "splash": 3
+    },
+    "cost": 20
+  },
+  "hover": {
+    "class": "special",
+    "hp": 80,
+    "armor": 2,
+    "radius": 2.2,
+    "speed": 13,
+    "reverse": 0.8,
+    "accelTime": 0.8,
+    "turnRate": 130,
+    "turretRate": 200,
+    "cost": 15,
+    "hover": true,
+    "damageTaken": 1.25,
+    "gun": {
+      "kind": "shell",
+      "damage": 18,
+      "cooldown": 0.6,
+      "range": 60,
+      "speed": 70,
+      "splash": 0
+    }
+  },
+  "inferno": {
+    "class": "medium",
+    "hp": 110,
+    "armor": 3,
+    "radius": 2.4,
+    "speed": 10,
+    "reverse": 0.5,
+    "accelTime": 1.0,
+    "turnRate": 95,
+    "turretRate": 160,
+    "cost": 15,
+    "gun": {
+      "kind": "flame",
+      "damage": 4.5,
+      "cooldown": 0.1,
+      "range": 12,
+      "speed": 0,
+      "splash": 0,
+      "cone": 30,
+      "burn": 2,
+      "burnDps": 5
+    }
+  },
+  "rattler": {
+    "class": "light",
+    "hp": 70,
+    "armor": 2,
+    "radius": 2.0,
+    "speed": 15,
+    "reverse": 0.6,
+    "accelTime": 0.7,
+    "turnRate": 130,
+    "turretRate": 200,
+    "cost": 10,
+    "gun": {
+      "kind": "rocket",
+      "damage": 13,
+      "cooldown": 0.5,
+      "range": 60,
+      "speed": 32,
+      "splash": 1.5,
+      "turnRate": 90,
+      "seekCone": 25
+    }
+  },
+  "rhino": {
+    "class": "heavy",
+    "hp": 200,
+    "armor": 8,
+    "radius": 3.2,
+    "speed": 6,
+    "reverse": 0.45,
+    "accelTime": 1.8,
+    "turnRate": 55,
+    "turretRate": 100,
+    "cost": 25,
+    "ramFactor": 2,
+    "gun": {
+      "kind": "shell",
+      "damage": 35,
+      "cooldown": 1.4,
+      "range": 70,
+      "speed": 50,
+      "splash": 2
+    }
+  },
+  "flpe": {
+    "class": "special",
+    "hp": 90,
+    "armor": 3,
+    "radius": 2.4,
+    "speed": 12,
+    "reverse": 0.5,
+    "accelTime": 1.0,
+    "turnRate": 100,
+    "turretRate": 170,
+    "cost": 20,
+    "gun": {
+      "kind": "laser",
+      "damage": 7,
+      "cooldown": 0.2,
+      "range": 65,
+      "speed": 0,
+      "splash": 0,
+      "heatPerShot": 11,
+      "coolRate": 25,
+      "overheat": 4
+    }
+  },
+  "sentinel": {
+    "class": "special",
+    "hp": 120,
+    "armor": 4,
+    "radius": 2.6,
+    "speed": 8,
+    "reverse": 0.5,
+    "accelTime": 1.3,
+    "turnRate": 80,
+    "turretRate": 120,
+    "cost": 20,
+    "deployBonus": 1.5,
+    "deployAfter": 1,
+    "gun": {
+      "kind": "mortar",
+      "damage": 40,
+      "cooldown": 1.8,
+      "range": 60,
+      "speed": 35,
+      "splash": 5,
+      "assistCone": 10
+    }
+  },
+  "warlord": {
+    "class": "boss",
+    "hp": 900,
+    "armor": 7,
+    "radius": 4.6,
+    "speed": 5.5,
+    "reverse": 0.5,
+    "accelTime": 2.0,
+    "turnRate": 45,
+    "turretRate": 90,
+    "cost": 999,
+    "rearMultiplier": 2.0,
+    "gun": {
+      "kind": "shell",
+      "damage": 40,
+      "cooldown": 1.2,
+      "range": 80,
+      "speed": 55,
+      "splash": 3.5
+    }
+  },
+  "truck": {
+    "class": "convoy",
+    "hp": 260,
+    "armor": 3,
+    "radius": 2.8,
+    "speed": 6,
+    "reverse": 0.5,
+    "accelTime": 1.5,
+    "turnRate": 70,
+    "turretRate": 0,
+    "cost": 0,
+    "gun": {
+      "kind": "shell",
+      "damage": 0,
+      "cooldown": 99,
+      "range": 0,
+      "speed": 1,
+      "splash": 0
+    }
   }
 }

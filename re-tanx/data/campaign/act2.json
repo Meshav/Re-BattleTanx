@@ -1,0 +1,1003 @@
+{
+ "act": 2,
+ "title": "The Long Road East",
+ "missions": [
+  {
+   "id": "a2m1",
+   "act": 2,
+   "title": "Bay Assault",
+   "location": "San Francisco",
+   "brief": [
+    "Home. The base on the bay \u2014 the first safe ground since New York.",
+    "Then the army that was supposed to protect it rolls up the coast road, guns turned inward.",
+    "Hold the yard until the column breaks."
+   ],
+   "debrief": "The column turns back. Nobody on the base cheers; they are counting who is left.",
+   "map": {
+    "id": "a2m1",
+    "name": "Bay Assault",
+    "cell": 10,
+    "rows": [
+     "############################",
+     "#e.........##........##...e#",
+     "#..##..............H......##",
+     "#..##...wwwwwwwwwwww....##.#",
+     "#.......w..........w.......#",
+     "#..A....w...S..S...w....D..#",
+     "#.......w..........w.......#",
+     "#..##...wwwww..wwwww...##..#",
+     "#..##....................C.#",
+     "#e.....R....##....##......e#",
+     "############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "goliath"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "m1",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 25
+     },
+     "tanks": [
+      "rhino",
+      "inferno",
+      "moto",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 60
+     },
+     "tanks": [
+      "goliath",
+      "goliath",
+      "rattler",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 100
+     },
+     "tanks": [
+      "sentinel",
+      "sentinel",
+      "rhino",
+      "m1"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "survive",
+     "label": "Hold the base for two and a half minutes",
+     "seconds": 150
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Break the column"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 30
+  },
+  {
+   "id": "a2m2",
+   "act": 2,
+   "title": "Desert Escape",
+   "location": "Mojave",
+   "brief": [
+    "The base is lost. You get out with what still runs.",
+    "Cross the flats to the dry riverbed in the east before the pursuit closes the gap.",
+    "Don't stop to fight unless they make you."
+   ],
+   "debrief": "Dust behind you, dust ahead. For now, only dust.",
+   "map": {
+    "id": "a2m2",
+    "name": "Desert Escape",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S..........#.......#........#",
+     "#.....H.....#...F...#....##..#",
+     "#..##...........##.......##.X#",
+     "#..##....ww.....##...ww......#",
+     "#............R...............#",
+     "#....##....ww.......##....J..#",
+     "#S...##.........A...##.....X.#",
+     "#e..........#.......#........#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": {
+      "after": 6
+     },
+     "tanks": [
+      "moto",
+      "moto",
+      "rattler"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 30
+     },
+     "tanks": [
+      "hover",
+      "hover",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 55
+     },
+     "tanks": [
+      "rattler",
+      "rattler",
+      "inferno"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "reach",
+     "label": "Reach the dry riverbed"
+    },
+    {
+     "kind": "parTime",
+     "label": "Get there in under 90 seconds",
+     "seconds": 90,
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 25
+  },
+  {
+   "id": "a2m3",
+   "act": 2,
+   "title": "Midwest Rally",
+   "location": "Kansas",
+   "brief": [
+    "A farm co-op has been running tanks off grain alcohol and spite.",
+    "Their best driver is penned in a silo yard by the Bone Riders.",
+    "Spring her and she'll ride with you for the rest of the war."
+   ],
+   "debrief": "She doesn't say thank you. She says 'which way's the fight.'",
+   "map": {
+    "id": "a2m3",
+    "name": "Midwest Rally",
+    "cell": 10,
+    "rows": [
+     "############################",
+     "#S.....##.......##.......e.#",
+     "#......##...C...##...Q.....#",
+     "#..H.............wwww......#",
+     "#.......##..........w..##..#",
+     "#..E....##.....##......##..#",
+     "#..............##....G.....#",
+     "#..##....ww..........##..e.#",
+     "#S.##.....C..A.......##....#",
+     "############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "moto",
+      "moto",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 40
+     },
+     "tanks": [
+      "inferno",
+      "rattler",
+      "rattler"
+     ]
+    },
+    {
+     "trigger": {
+      "cleared": 1
+     },
+     "tanks": [
+      "goliath",
+      "m1"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "rescue",
+     "label": "Bring the driver to the barn"
+    },
+    {
+     "kind": "caches",
+     "label": "Find the co-op's buried cash",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 30
+  },
+  {
+   "id": "a2m4",
+   "act": 2,
+   "title": "Capitol Siege",
+   "location": "Washington",
+   "brief": [
+    "The capitol dome is a radio mast now. Every army in the east listens to it.",
+    "Three transmitters, a ring of gun emplacements, and whoever is left guarding them.",
+    "Bring the masts down."
+   ],
+   "debrief": "The airwaves go quiet. Somewhere a general is shouting into a dead microphone.",
+   "map": {
+    "id": "a2m4",
+    "name": "Capitol Siege",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S.......u..........u.....e..#",
+     "#.....######....######.......#",
+     "#..H..#....#....#....#...A...#",
+     "#.....#.T..#....#..T.#.......#",
+     "#.........u..TT..u...........#",
+     "#.....#....#....#....#...R...#",
+     "#..G..######....######.......#",
+     "#S..........C..........u..e..#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "goliath",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "goliath",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 45
+     },
+     "tanks": [
+      "rhino",
+      "sentinel",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "targetsDown": true
+     },
+     "tanks": [
+      "goliath",
+      "goliath",
+      "inferno",
+      "rattler"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "destroyTargets",
+     "label": "Topple the transmitters"
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Clear the plaza"
+    },
+    {
+     "kind": "destroyTurrets",
+     "label": "Silence the emplacements",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 35
+  },
+  {
+   "id": "a2m5",
+   "act": 2,
+   "title": "Atlantic Port",
+   "location": "Baltimore",
+   "brief": [
+    "A freighter is waiting with steam up. Its captain will take you across \u2014 with one passenger.",
+    "The harbourmaster's daughter is held at the customs house on the far pier.",
+    "Get her aboard before the tide turns."
+   ],
+   "debrief": "Gangplank up. The coast falls away behind you.",
+   "map": {
+    "id": "a2m5",
+    "name": "Atlantic Port",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S....##.......H.......##..Q.#",
+     "#.....##...............##....#",
+     "#..A......~~~~~~..~~~~~......#",
+     "#.........~~~~~~..~~~~~...e..#",
+     "#..##.....~~~~~~..~~~~~......#",
+     "#..##........G...........##..#",
+     "#E.......##.......##.....##..#",
+     "#S.......##...C...##......e..#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "moto",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 35
+     },
+     "tanks": [
+      "hover",
+      "hover",
+      "rattler"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 70
+     },
+     "tanks": [
+      "rhino",
+      "m1",
+      "inferno"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "rescue",
+     "label": "Get her to the ship"
+    },
+    {
+     "kind": "parTime",
+     "label": "Before the tide turns (2 minutes)",
+     "seconds": 120,
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 30
+  },
+  {
+   "id": "a2m6",
+   "act": 2,
+   "title": "London Docks",
+   "location": "London",
+   "brief": [
+    "Fog off the river so thick you hear tanks before you see them.",
+    "The Black Halos run the docks from inside the warehouses.",
+    "Clear them out. Trust your radar more than your eyes."
+   ],
+   "debrief": "The fog lifts at noon. The docks are yours, for what that's worth.",
+   "map": {
+    "id": "a2m6",
+    "name": "London Docks",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S...####....H....####.....e.#",
+     "#....####.........####.......#",
+     "#..........ww..ww............#",
+     "#..C.###...........###..A....#",
+     "#....###....R......###.......#",
+     "#..........ww..ww........C...#",
+     "#....####.........####.......#",
+     "#S...####....D....####....e..#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "hover",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "hover",
+      "hover",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 30
+     },
+     "tanks": [
+      "rattler",
+      "rattler",
+      "hover"
+     ]
+    },
+    {
+     "trigger": {
+      "cleared": 1
+     },
+     "tanks": [
+      "goliath",
+      "inferno",
+      "m1",
+      "m1"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "destroyAll",
+     "label": "Clear the docks"
+    },
+    {
+     "kind": "caches",
+     "label": "Find the smugglers' stash",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 35,
+   "fog": 0.6
+  },
+  {
+   "id": "a2m7",
+   "act": 2,
+   "title": "Thames Embankment",
+   "location": "London",
+   "brief": [
+    "The Halos' couriers are making a run along the embankment with everything they know about you.",
+    "Two of them, fast. If they reach the bridges, they're gone.",
+    "Cut them off."
+   ],
+   "debrief": "The couriers' satchels are full of photographs. Of you.",
+   "map": {
+    "id": "a2m7",
+    "name": "Thames Embankment",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S.........................O.#",
+     "#..H.........................#",
+     "#~~~~~~~~~~~~..~~~~~~~~~~~~~~#",
+     "#~~~~~~~~~~~~..~~~~~~~~~~~~~~#",
+     "#.....e......................#",
+     "#..##....##..A...##....##..O.#",
+     "#..##....##......##....##....#",
+     "#S......G.......R............#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "moto",
+      "rattler"
+     ],
+     "runner": true,
+     "difficulty": "normal"
+    },
+    {
+     "trigger": "start",
+     "tanks": [
+      "hover",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 25
+     },
+     "tanks": [
+      "goliath",
+      "rattler"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "stopRunners",
+     "label": "Stop the couriers"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 35
+  },
+  {
+   "id": "a2m8",
+   "act": 2,
+   "title": "Paris Boulevards",
+   "location": "Paris",
+   "brief": [
+    "Three signals from three cellars, all claiming to be the resistance contact who knows where the Rift comes from.",
+    "Two of them are bait.",
+    "Bring the real one out alive."
+   ],
+   "debrief": "She talks for an hour. The Rift isn't a weapon. It's a place.",
+   "map": {
+    "id": "a2m8",
+    "name": "Paris Boulevards",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S..##....Q...##....H..##...e#",
+     "#...##........##.......##....#",
+     "#........w..........w........#",
+     "#..E.....w...####...w..Q.....#",
+     "#........w...####...w........#",
+     "#...##........##.......##....#",
+     "#...##..G.....##..Q....##..e.#",
+     "#S...........C........D......#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "m1",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "inferno",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "decoy": true
+     },
+     "tanks": [
+      "goliath",
+      "rhino",
+      "rattler",
+      "rattler"
+     ],
+     "difficulty": "normal"
+    },
+    {
+     "trigger": {
+      "after": 60
+     },
+     "tanks": [
+      "hover",
+      "hover",
+      "sentinel"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "rescue",
+     "label": "Bring out the real contact"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 40,
+   "decoys": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": "a2m9",
+   "act": 2,
+   "title": "Catacomb Approach",
+   "location": "Paris",
+   "brief": [
+    "The way east runs under the city: bone-lined tunnels just wide enough for a tank.",
+    "The Halos have mined them. Go slow, watch the floor, and blow the vent stacks on the far side.",
+    "Mine pickups along the way are yours to use."
+   ],
+   "debrief": "Daylight again. Your driver won't stop counting skulls out loud.",
+   "map": {
+    "id": "a2m9",
+    "name": "Catacomb Approach",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S.#######.......#######....e#",
+     "#..#.....m...H...m.....#..T..#",
+     "#..#..#######.#######..#.....#",
+     "#.....#.....#m#.....#.......X#",
+     "#..#..#..M..#.#..A..#..#..T..#",
+     "#..#..#######.#######..#.....#",
+     "#..#.....m.......m.....#..e..#",
+     "#S.#######...G...#######.....#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "hover",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "reached": true
+     },
+     "tanks": [
+      "inferno",
+      "rattler",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "targetsDown": true
+     },
+     "tanks": [
+      "goliath",
+      "hover"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "reach",
+     "label": "Get through the catacombs"
+    },
+    {
+     "kind": "destroyTargets",
+     "label": "Blow the vent stacks"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 35
+  },
+  {
+   "id": "a2m10",
+   "act": 2,
+   "title": "Rhine Bridgehead",
+   "location": "Cologne",
+   "brief": [
+    "One bridge still stands over the Rhine and you're on the wrong side of it \u2014 the right side, now.",
+    "Everything the Rift has is coming across. Hold the bridgehead until the engineers wire it.",
+    "Then break whatever made it over."
+   ],
+   "debrief": "The bridge goes up at dusk. The river runs red with rust.",
+   "map": {
+    "id": "a2m10",
+    "name": "Rhine Bridgehead",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#e..........................S#",
+     "#..A...##.............##.....#",
+     "#~~~~~~~~~~~~~..~~~~~~~~~~~~~#",
+     "#~~~~~~~~~~~~~..~~~~~~~~~~~~~#",
+     "#~~~~~~~~~~~~~..~~~~~~~~~~~~~#",
+     "#~~~~~~~~~~~~~..~~~~~~~~~~~~~#",
+     "#..R...##.............##..H..#",
+     "#e..........................S#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "goliath",
+    "m1",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "m1",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 30
+     },
+     "tanks": [
+      "hover",
+      "hover",
+      "rattler"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 60
+     },
+     "tanks": [
+      "rhino",
+      "goliath",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 100
+     },
+     "tanks": [
+      "sentinel",
+      "sentinel",
+      "goliath",
+      "inferno"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "survive",
+     "label": "Hold the bridgehead for two and a half minutes",
+     "seconds": 150
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Destroy everything that crossed"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 40
+  },
+  {
+   "id": "a2m11",
+   "act": 2,
+   "title": "Berlin Wall Line",
+   "location": "Berlin",
+   "brief": [
+    "They rebuilt the wall. Not to keep anyone in \u2014 to keep the Rift's factories safe behind it.",
+    "Breach it, wreck the three foundries, and silence the guns on the wall.",
+    "Walls fall down if you hit them enough. Remember that."
+   ],
+   "debrief": "The wall comes down a second time. Nobody is dancing on it.",
+   "map": {
+    "id": "a2m11",
+    "name": "Berlin Wall Line",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S.........u....u.........e..#",
+     "#..H..................T......#",
+     "#wwwwwwwwwwwwwwwwwwwwwwwwwwww#",
+     "#.........u...T......u....A..#",
+     "#..##..............##........#",
+     "#wwwwwwwwwwwwwwwwwwwwwwwwwwww#",
+     "#..G.......T.............e...#",
+     "#S......C......R.....u.......#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "goliath",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "m1",
+      "sentinel"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 40
+     },
+     "tanks": [
+      "goliath",
+      "rhino",
+      "rattler"
+     ]
+    },
+    {
+     "trigger": {
+      "targetsDown": true
+     },
+     "tanks": [
+      "goliath",
+      "goliath",
+      "sentinel",
+      "inferno"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "destroyTargets",
+     "label": "Wreck the foundries"
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Break the garrison"
+    },
+    {
+     "kind": "destroyTurrets",
+     "label": "Silence the wall guns",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 45
+  },
+  {
+   "id": "a2m12",
+   "act": 2,
+   "title": "Rift Spire",
+   "location": "The Rift",
+   "brief": [
+    "The Spire. Everything the Rift built points here, and so does everything it took.",
+    "Its Warlord is waiting at the top of the ramp with every gun it has left.",
+    "End it."
+   ],
+   "debrief": "The Spire falls silent. For the first time in years, so does the radio. Then, faintly, music.",
+   "map": {
+    "id": "a2m12",
+    "name": "Rift Spire",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S..u.....##........##.....u.#",
+     "#........##..........##......#",
+     "#..H....w....wwwwww....w..A..#",
+     "#.......w....w....w....w.....#",
+     "#..u....w....w..e.w....w...u.#",
+     "#.......w....ww..ww....w.....#",
+     "#..G.........................#",
+     "#S......##..D......R..##...e.#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "goliath",
+    "m1",
+    "inferno"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "warlord",
+      "goliath",
+      "rhino"
+     ],
+     "boss": true,
+     "difficulty": "hard"
+    },
+    {
+     "trigger": {
+      "after": 40
+     },
+     "tanks": [
+      "hover",
+      "hover",
+      "rattler"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 80
+     },
+     "tanks": [
+      "sentinel",
+      "sentinel",
+      "m1"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "destroyAll",
+     "label": "Bring down the Warlord of the Rift"
+    },
+    {
+     "kind": "destroyTurrets",
+     "label": "Silence the Spire's guns",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 60
+  }
+ ]
+}

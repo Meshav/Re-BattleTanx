@@ -1,11 +1,41 @@
-# Phase 0: Caddy serves the built client. Build first: `npm ci && npm run build`.
-# Game server + MariaDB services are added in Phases 4 and 6.
 services:
-  web:
-    image: caddy:2-alpine
+  db:
+    image: mariadb:11
     restart: unless-stopped
-    ports:
-      - '38473:80'
+    environment:
+      MARIADB_DATABASE: retanx
+      MARIADB_USER: retanx
+      MARIADB_PASSWORD: ${DB_PASSWORD:-change-me-too}
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./packages/client/dist:/srv:ro
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      retries: 20
+  game:
+    build: { context: ., target: server }
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      # tables are created on first boot from sql/schema.sql
+      DATABASE_URL: mysql://retanx:${DB_PASSWORD:-change-me-too}@db:3306/retanx
+      # set a long random value so player tokens survive restarts: openssl rand -hex 32
+      SERVER_SECRET: ${SERVER_SECRET:-change-me}
+      # sign-in (optional): the public address players use, plus any provider's OAuth app credentials.
+      # Redirect URI to register with the provider: ${PUBLIC_URL}/auth/discord/callback (or /google/)
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+  web:
+    build: { context: ., target: web }
+    depends_on: [game]
+    ports: ["8080:8080"]
+    environment:
+      SITE_ADDRESS: ":8080"
+    restart: unless-stopped
+volumes:
+  db:

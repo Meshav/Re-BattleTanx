@@ -1,0 +1,147 @@
+{
+  "thinkHz": 5,
+  "hysteresis": 0.15,
+  "perception": {
+    "visionRange": 70,
+    "visionCone": 120,
+    "proximity": 14,
+    "hearGunfire": 60,
+    "hearExplosion": 120,
+    "memory": 8
+  },
+  "pickupRange": 35,
+  "stuckTime": 1.2,
+  "difficulty": {
+    "easy": {
+      "reaction": 0.8,
+      "aimError": 9,
+      "lead": 0,
+      "tokens": 2,
+      "superShots": false,
+      "specials": [
+        "health",
+        "mine",
+        "shock",
+        "speed",
+        "swarm"
+      ],
+      "aggression": 0.8
+    },
+    "normal": {
+      "reaction": 0.5,
+      "aimError": 5,
+      "lead": 0.5,
+      "tokens": 3,
+      "superShots": false,
+      "specials": [
+        "health",
+        "laser",
+        "mine",
+        "nuke",
+        "plasma",
+        "repair",
+        "shield",
+        "shock",
+        "speed",
+        "swarm",
+        "turret"
+      ],
+      "aggression": 1.0
+    },
+    "hard": {
+      "reaction": 0.3,
+      "aimError": 2.5,
+      "lead": 1,
+      "tokens": 4,
+      "superShots": true,
+      "specials": [
+        "cloak",
+        "edge",
+        "guided",
+        "health",
+        "laser",
+        "mine",
+        "nuke",
+        "plasma",
+        "repair",
+        "shield",
+        "shock",
+        "speed",
+        "swarm",
+        "teleport",
+        "turret"
+      ],
+      "aggression": 1.15
+    },
+    "battlelord": {
+      "reaction": 0.2,
+      "aimError": 1.5,
+      "lead": 1,
+      "tokens": 99,
+      "superShots": true,
+      "specials": [
+        "cloak",
+        "edge",
+        "guided",
+        "health",
+        "laser",
+        "mine",
+        "nuke",
+        "plasma",
+        "repair",
+        "shield",
+        "shock",
+        "speed",
+        "swarm",
+        "teleport",
+        "turret"
+      ],
+      "aggression": 1.3
+    }
+  },
+  "archetypes": {
+    "raider": {
+      "range": 22,
+      "retreatHp": 0.4,
+      "engage": 0.9,
+      "pickup": 1.2
+    },
+    "line": {
+      "range": 35,
+      "retreatHp": 0.3,
+      "engage": 1.0,
+      "pickup": 1.0
+    },
+    "bulwark": {
+      "range": 40,
+      "retreatHp": 0.2,
+      "engage": 1.1,
+      "pickup": 0.8
+    },
+    "brawler": {
+      "range": 10,
+      "retreatHp": 0.25,
+      "engage": 1.2,
+      "pickup": 0.9
+    },
+    "artillery": {
+      "range": 50,
+      "retreatHp": 0.35,
+      "engage": 1.0,
+      "pickup": 0.8
+    }
+  },
+  "archetypeByTank": {
+    "moto": "raider",
+    "m1": "line",
+    "goliath": "bulwark",
+    "hover": "raider",
+    "inferno": "brawler",
+    "rattler": "raider",
+    "rhino": "brawler",
+    "flpe": "line",
+    "sentinel": "artillery",
+    "warlord": "bulwark",
+    "truck": "line"
+  }
+}

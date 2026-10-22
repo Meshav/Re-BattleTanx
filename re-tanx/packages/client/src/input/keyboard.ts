@@ -1,28 +1,22 @@
-import type { InputState } from '@re-tanx/sim';
+/** Live set of held keys by KeyboardEvent.code, plus one-shot presses for toggles. */
+export interface Keyboard { held: Set<string>; pressed: Set<string> }
 
-const held = new Set<string>();
-let enabled = false;
-
-export function enableKeyboard(value: boolean): void {
-  enabled = value;
-  held.clear();
-}
-
-export function startKeyboard(): void {
-  addEventListener('keydown', (e) => {
-    if (enabled) held.add(e.code);
+export function createKeyboard(target: Window): Keyboard {
+  const kb: Keyboard = { held: new Set(), pressed: new Set() };
+  target.addEventListener("keydown", (e) => {
+    if (!e.repeat) kb.pressed.add(e.code);
+    kb.held.add(e.code);
+    if (e.code === "Space" || e.code === "Tab") e.preventDefault();
   });
-  addEventListener('keyup', (e) => held.delete(e.code));
-  addEventListener('blur', () => held.clear());
+  target.addEventListener("keyup", (e) => kb.held.delete(e.code));
+  target.addEventListener("blur", () => kb.held.clear());
+  return kb;
 }
 
-export function readKeyboard(): InputState {
-  return {
-    throttle: axis('KeyW', 'KeyS'),
-    steer: axis('KeyA', 'KeyD'),
-  };
+/** Read-and-clear a one-shot press. */
+export function consumePress(kb: Keyboard, code: string): boolean {
+  return kb.pressed.delete(code);
 }
 
-function axis(positive: string, negative: string): number {
-  return (held.has(positive) ? 1 : 0) - (held.has(negative) ? 1 : 0);
-}
+export const axis = (kb: Keyboard, neg: string[], pos: string[]): number =>
+  (pos.some((k) => kb.held.has(k)) ? 1 : 0) - (neg.some((k) => kb.held.has(k)) ? 1 : 0);

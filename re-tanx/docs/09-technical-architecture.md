@@ -1,119 +1,103 @@
 # 09 — Technical Architecture
 
+> **Status (Oct 2026, through S29):** this doc describes the system **as built**. Items still planned are marked ⏳. Doc 11 has the phased checklist; doc 12 has the module map; the repo's `CHANGES_LOG.md` has per-section detail.
+
 ## 9.1 Stack
-The chosen stack, the repo layout, and when to upgrade each piece are in **doc 11 §11.1**. In short: TypeScript, Vite, Three.js, plain HTML UI, hand-rolled collision, grid A*, Node + `ws`, MariaDB, Docker Compose on the homelab.
+TypeScript everywhere, Vite, Three.js, plain HTML/CSS UI, hand-rolled 2D collision, grid A*, Node + `ws`, MariaDB (via `mysql2`) with a JSON-file fallback, Docker Compose + Caddy. Audio is plain Web Audio, not Howler: the sound set is small and generated (doc 11 §11.1 explains the choice).
 
 ## 9.2 Repo layout
-See doc 11 §11.1. The shared simulation lives in `packages/sim`, and the API lives inside `server` until it needs to be split out.
+npm workspaces: `packages/sim` (pure simulation, no DOM/Node), `packages/client` (Vite + Three.js), `packages/server` (Node + ws, run with tsx). Data in `data/*.json`, SQL in `sql/schema.sql`, tooling in `scripts/`, these docs in `docs/`. Module maps: doc 12 §12.4.
 
 ## 9.3 Simulation
-- **Fixed timestep 30 Hz** sim (shared package), rendered at display rate with interpolation.
-- **ECS-lite**: plain arrays/maps of components (Transform, Tank, Health, Weapon, Inventory, AIBrain, Pickup, Destructible, Projectile).
-- Deterministic-enough math (no reliance on cross-machine float determinism — server is truth).
-- Same sim runs **locally** for single-player/split-screen (no server needed → playable offline / as a static site).
+- **Fixed 30 Hz** shared sim, rendered at display rate with interpolation.
+- **World is plain data**; `stepWorld` is the only place systems are ordered. Systems emit `SimEvent`s that render, audio, HUD and net consume.
+- **Fully deterministic** given a seed and the inputs. Seeded RNG lives in the world; there's no `Math.random` or time in the sim. Inputs are quantized before the sim sees them. This is what makes replays (§9.11) bit-identical between browser, server and Node.
+- The same sim runs **locally** for single-player, split-screen and campaign: no server needed, playable offline as a static site.
 
-## 9.4 Netcode
-- **Client → server**: input commands `{seq, tick, move, turretAngle, fire, special, swap}` at 30 Hz.
-- **Server → client**: snapshots at 20 Hz, delta-compressed against last acked snapshot; binary encoding (custom DataView or `msgpackr`).
-- **Client prediction** for own tank movement + reconciliation on snapshot.
-- **Interpolation** of other entities ~100 ms behind.
-- **Lag compensation** for hitscan: server rewinds target positions by the shooter's RTT/2 (cap 200 ms).
-- Projectiles: server-spawned; client spawns a predicted visual immediately and reconciles.
-- **Destruction state** sent as events (`structureId, stage`) + included in join snapshot.
-- Bandwidth target: < 40 KB/s per client at 8 players.
+## 9.4 Netcode (as built)
+- **Client → server:** `{t:"input", seq, input, view}` at 30 Hz. `input` = throttle, steer, strafe, aim, fire, special, cycle. `view` = the server tick the client's interpolated view of other tanks shows (for lag compensation). Everything is parsed and clamped in `sim/net/validate.ts`.
+- **Server → client:** snapshots at **20 Hz**, JSON.
+  - **hot** per-tank state every snapshot; **meta** (names, rosters, specials…) only when changed, plus a full refresh every 30 ticks.
+  - **private** fields (your own heat, specials) only to the owner.
+  - Structure stages and pickups only when changed. Events ride along.
+  - ⏳ Binary encoding (only if JSON > 40 KB/s per client; not needed yet).
+- **Client prediction** of your own tank (the shared `moveTank`, including rail riding) with reconciliation on each snapshot's `ack`. **Interpolation** of everything else between the last two snapshots.
+- **Lag compensation (hitscan)** ✅ *(S25)*:
+  - The server keeps every tank's position for the last **8 ticks (~250 ms)** (`sim/systems/lagComp.ts`).
+  - An instant-hit shot (machine gun, laser gun, laser special) is resolved with other tanks moved back to the shooter's `view` tick, then restored. Tanks that weren't on the field then can't be hit.
+  - The claimed tick is clamped to the window at fire time. Bots, and seats a bot took over, shoot in the present.
+  - Structures aren't rewound. Projectiles (shells, rockets, mortars, flame) aren't either: they travel in the shared world.
+- **Destruction state**: stage string in snapshots when changed; a full state on join and rejoin.
+- **Rejoin** ✅ *(S26)*: a closed socket marks the seat "away" for 60 s with a bot driving. `{t:"rejoin", code}` with the same signed token reclaims it: fresh input queue, full snapshot, and a `"human"` action in the replay.
+- **Bandwidth**: comfortably under the 40 KB/s budget at 8 players in tests. ⏳ A dev network simulator (latency/jitter/loss) isn't built.
 
-## 9.5 Server topology
+## 9.5 Server topology (as built)
 ```
-[Browser] ──HTTPS──> [Static host / CDN]  (client bundle, assets)
-    │
-    ├──HTTPS──> [API service] ──> [MariaDB]
-    │
-    └──WSS────> [Match server(s)]  (one Node process hosts N matches; ~8–12 matches/core)
-                     │
-                     └──> [API] post match results (server-signed)
+[Browser] ──HTTPS──> [Caddy]  static client + audio (/srv)
+                       ├── /ws          → game:8787  (WebSocket: lobbies + matches)
+                       ├── /auth/*      → game:8787  (Discord/Google sign-in)
+                       ├── /leaderboard → game:8787  (top 20 ranked)
+                       ├── /history     → game:8787  (your matches; Bearer token)
+                       └── /health      → game:8787
+[game] one Node process: lobby registry + N matches (each its own World + 30 Hz ticker) ──> [MariaDB]
 ```
-- Lobby service can live inside the match server for v1 (single box).
-- Self-hostable on a homelab box behind a reverse proxy (Caddy/Nginx) with TLS; WebSocket upgrade passthrough.
-- Horizontal scale later: Redis lobby registry + multiple match servers.
+- No separate API service: the few HTTP endpoints live in the game server.
+- Docker Compose runs `db` (mariadb:11, healthcheck), `game` and `web` (Caddy). `SITE_ADDRESS` turns on automatic HTTPS.
+- Env: `SERVER_SECRET` (token signing), `DATABASE_URL`, `PUBLIC_URL` + `DISCORD_/GOOGLE_CLIENT_ID/SECRET` (optional sign-in), `DATA_DIR` (file store).
+- The Dockerfile's base images are build args (`NODE_IMAGE`, `CADDY_IMAGE`) for mirrors or pinned digests.
+- Health and smoke: `GET /health`; `node scripts/smoke-match.mjs wss://host/ws` plays a match against bots and checks the award and match history.
+- ⏳ Horizontal scale (Redis lobby registry, several game processes) only when one process isn't enough (doc 11 §11.4).
 
-## 9.6 Data model (MariaDB, draft)
+## 9.6 Data model (MariaDB, as built — `sql/schema.sql`)
+Tables are created on boot. Later columns are added with idempotent `ALTER TABLE … ADD COLUMN IF NOT EXISTS`, so older databases upgrade themselves.
+
 ```sql
-CREATE TABLE players (
-  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  handle VARCHAR(24) NOT NULL UNIQUE,
-  auth_provider VARCHAR(16), auth_subject VARCHAR(128),
-  level SMALLINT UNSIGNED NOT NULL DEFAULT 1,
-  xp INT UNSIGNED NOT NULL DEFAULT 0,
-  title VARCHAR(32), emblem JSON,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY (auth_provider, auth_subject)
-);
-
-CREATE TABLE unlocks (
-  player_id BIGINT UNSIGNED, unlock_key VARCHAR(48),
-  unlocked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (player_id, unlock_key)
-);
-
-CREATE TABLE tank_mastery (
-  player_id BIGINT UNSIGNED, tank_id VARCHAR(24),
-  xp INT UNSIGNED DEFAULT 0, level TINYINT UNSIGNED DEFAULT 1,
-  PRIMARY KEY (player_id, tank_id)
-);
-
-CREATE TABLE loadouts (
-  player_id BIGINT UNSIGNED PRIMARY KEY,
-  perks JSON, cosmetics JSON, favorite_gang VARCHAR(24)
-);
-
-CREATE TABLE campaign_progress (
-  player_id BIGINT UNSIGNED, mission_id VARCHAR(32),
-  best_grade CHAR(1), caches_found TINYINT UNSIGNED, best_time_ms INT UNSIGNED,
-  bucks_on_entry SMALLINT UNSIGNED,
-  PRIMARY KEY (player_id, mission_id)
-);
-
-CREATE TABLE matches (
-  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  mode VARCHAR(16), map_id VARCHAR(32), ranked BOOLEAN,
-  started_at DATETIME, ended_at DATETIME, winner_team TINYINT
-);
-
-CREATE TABLE match_players (
-  match_id BIGINT UNSIGNED, player_id BIGINT UNSIGNED NULL, -- NULL = bot/guest
-  team TINYINT, gang VARCHAR(24),
-  kills SMALLINT, deaths SMALLINT, assists SMALLINT,
-  objective_score INT, damage_dealt INT, structures_destroyed SMALLINT,
-  xp_awarded INT,
-  PRIMARY KEY (match_id, team, player_id)
-);
-
-CREATE TABLE challenges (
-  player_id BIGINT UNSIGNED, challenge_id VARCHAR(32), period_start DATE,
-  progress INT, completed_at DATETIME NULL,
-  PRIMARY KEY (player_id, challenge_id, period_start)
-);
+players (id VARCHAR(32) PK,            -- player id from the signed token
+         handle VARCHAR(24) NULL,
+         xp INT UNSIGNED,              -- copied out for sorting
+         profile JSON,                 -- whole Profile: xp, perks, mastery, totals, challenges, rating, name
+         updated_at DATETIME)
+identities (provider, subject PK, player_id)       -- Discord/Google account → player; first link wins
+matches (id PK, mode, map_id, started_at, ended_at, winner_team, ranked, bots)
+match_players (match_id, player_id PK, team, gang, kills, deaths, xp_awarded,
+               name, place, left_early, rating_delta)   + index (player_id, match_id)
 ```
-Ranked ratings table added post-1.0.
+- **Profile as a JSON column**: the shape can evolve without migrations, and the sim's `sanitizeProfile` validates it on read.
+- **Atomic updates**: `ProfileStore.update(id, fn)` inserts the row if missing, then `SELECT … FOR UPDATE` inside a transaction. Concurrent awards can't lose XP; tested with 10 parallel updates.
+- **Ranking** reads `rating` from the JSON column (`shortcut:` note — add a generated column + index if it gets slow).
+- ⏳ Not stored server-side yet: campaign progress (kept in the browser), unlocks as rows (derived from XP), challenge rows (inside the profile JSON).
+- **File store** (no `DATABASE_URL`): one JSON file per player, `identities.json`, `matches.jsonl`. Atomic temp-file+rename writes; fine for a homelab.
 
 ## 9.7 Performance budgets
-| Target | Budget |
-|--------|--------|
-| Initial download | < 15 MB to first match (lazy-load maps/audio) |
-| Draw calls | < 300 per viewport (instance props, merge static geometry) |
-| Frame | 60 fps on integrated GPU at 1080p single view |
-| Mobile | 30 fps on mid-range phone, tactical camera, reduced effects |
-| Server tick | < 10 ms per match tick incl. AI |
+| Target | Budget | Status |
+|--------|--------|--------|
+| Initial download | < 15 MB to first match | ✅ ~0.7 MB JS + ~2 MB audio |
+| Frame | 60 fps on integrated GPU at 1080p single view | Low-poly procedural models; "Low" graphics setting |
+| Mobile | 30 fps mid-range phone, touch twin-stick | Touch controls ✅; ⏳ not measured on hardware |
+| Server tick | < 10 ms per match tick incl. AI | Soak tests run bot matches far faster than real time |
 
-Techniques: instanced meshes for props, baked lighting for static geo, pooled projectiles/particles, LOD for distant tanks, compressed textures (KTX2/Basis), Draco/Meshopt geometry.
+⏳ Not built (no art assets yet): instancing, baked lighting, KTX2/Meshopt.
 
 ## 9.8 Input
-Unified input layer → per-player `InputState`. Sources: keyboard/mouse (Pointer Lock), Gamepad API (up to 4), touch. Split-screen assigns devices to player slots in the lobby.
+Unified layer → per-player `InputState`: keyboard+mouse, arrow keys, Gamepad API (up to 4), touch twin-stick. Full key rebinding in Settings. Cameras: chase / cockpit / top-down (V or Back).
 
 ## 9.9 Testing
-- Unit tests on `shared` sim (damage, pickups, mode win conditions).
-- Headless bot-vs-bot matches in CI for crash/regression + balance telemetry.
-- Network sim: artificial latency/jitter/loss in dev (e.g., 150 ms ± 30, 2% loss).
+- **Vitest**, 255 tests across sim, client and server. `npm run check` = structure rules + IP-name guard + typecheck + tests.
+- Sim rules tested beside their code. **Soak test**: bot-vs-bot matches end with no NaNs. Every campaign mission is tested for marker sanity, drivability (flood fill) and scripted completion.
+- **Determinism tests**: replays re-simulate bit-identically, including lag compensation, dropouts and rejoins, recorded in Chromium and re-run in Node.
+- **Server integration**: real WebSocket clients for lobbies, rejoin, trust boundaries and history auth. Fake timers for quick-match auto-start.
+- **Store contract tests** run against memory, files and real MariaDB (`TEST_DATABASE_URL`).
+- **Headless-browser smoke tests** (Playwright + Chromium) per feature: two-browser online, touch, campaign, rejoin, quick match, map editor.
+- ⏳ Network simulator for latency/jitter/loss.
 
 ## 9.10 Save & settings
-Settings (bindings, graphics, audio) in localStorage; progression on server. Offline/guest campaign progress in IndexedDB with optional upload when the player creates an account.
+- Browser (`localStorage`): settings (volume, music, quality, colour-blind, reduced motion, bindings), local profile (offline XP), campaign progress, last match setup, saved arenas, last replay, player token, pending rejoin.
+- Server: online profile, ratings, identities, match history.
+- ⏳ Uploading offline campaign progress to the account.
+
+## 9.11 Replays
+A replay is setup + human inputs (only on ticks where they change) + rare actions:
+- **Setup:** map or embedded custom arena, slots, seed, mode, or mission id + opening purchase.
+- **Actions:** campaign redeploy, `"bot"` takeover, `"human"` rejoin.
+
+Local, campaign and online matches all record. The server records online matches and sends each player the replay at the end. Playback has a spectator camera, tank cycling and 1×/2×/4× speed. Replay files are validated before use. A 3-minute match is roughly 100–200 KB.

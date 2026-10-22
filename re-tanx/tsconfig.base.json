@@ -5,11 +5,10 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   }
 }

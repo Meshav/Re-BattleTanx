@@ -1,0 +1,80 @@
+{
+  "health": {
+    "respawn": 25,
+    "heal": 50
+  },
+  "shield": {
+    "respawn": 40,
+    "absorb": 80,
+    "duration": 20
+  },
+  "ammo": {
+    "respawn": 30
+  },
+  "guided": {
+    "respawn": 30,
+    "amount": 2
+  },
+  "swarm": {
+    "respawn": 30,
+    "amount": 4
+  },
+  "mine": {
+    "respawn": 30,
+    "amount": 3
+  },
+  "nuke": {
+    "respawn": 120,
+    "amount": 1
+  },
+  "star": {
+    "respawn": 0,
+    "heal": 15,
+    "life": 20
+  },
+  "loot": {
+    "respawn": 0,
+    "life": 20
+  },
+  "radius": 2.6,
+  "bucks": {
+    "respawn": 0,
+    "amount": 5
+  },
+  "laser": {
+    "respawn": 40,
+    "amount": 2
+  },
+  "plasma": {
+    "respawn": 40,
+    "amount": 2
+  },
+  "turret": {
+    "respawn": 40,
+    "amount": 1
+  },
+  "shock": {
+    "respawn": 40,
+    "amount": 1
+  },
+  "cloak": {
+    "respawn": 40,
+    "amount": 1
+  },
+  "speed": {
+    "respawn": 40,
+    "amount": 1
+  },
+  "teleport": {
+    "respawn": 40,
+    "amount": 1
+  },
+  "repair": {
+    "respawn": 40,
+    "amount": 1
+  },
+  "edge": {
+    "respawn": 120,
+    "amount": 1
+  }
+}

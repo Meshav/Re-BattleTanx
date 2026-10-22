@@ -1,0 +1,28 @@
+{
+  "_doc": "Every player-visible name for things the original games named (rename/legal pass, docs README). Internal ids (battlelord, goliath, queen\u2026) never reach the screen; these do. scripts/check-ip.mjs fails the build if an original name shows up in player-facing text.",
+  "game": "Re-Tanx",
+  "tanks": {
+    "moto": "Scout",
+    "m1": "Ranger",
+    "goliath": "Behemoth",
+    "hover": "Skimmer",
+    "inferno": "Torch",
+    "rattler": "Viper",
+    "rhino": "Ram",
+    "flpe": "Lancer",
+    "sentinel": "Howitzer",
+    "warlord": "Warlord",
+    "truck": "Truck"
+  },
+  "queen": {
+    "one": "Oracle",
+    "many": "Oracles"
+  },
+  "currency": "Scrap",
+  "rift": "Rift",
+  "modes": {
+    "battlelord": "Oracle Raid",
+    "family": "Rookie",
+    "holdEm": "Keep Away"
+  }
+}

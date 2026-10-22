@@ -1,0 +1,970 @@
+{
+ "act": 1,
+ "title": "The Long Road West",
+ "missions": [
+  {
+   "id": "a1m1",
+   "act": 1,
+   "title": "Queens Ruins",
+   "location": "Queens, New York",
+   "brief": [
+    "New York is gone. The gangs that crawled out of the rubble call themselves Oracle Raids now.",
+    "Your fiancée was taken somewhere west. Before you can follow, you need to get out of Queens alive.",
+    "Drive with WASD, aim with the mouse, fire with the left button. Buildings fall apart — some hide supplies."
+   ],
+   "debrief": "Queens is behind you. The road west is long, and word travels fast among the gangs.",
+   "map": {
+    "id": "a1m1",
+    "name": "Queens Ruins",
+    "cell": 10,
+    "rows": [
+     "########################",
+     "#S......##.....e.......#",
+     "#.......##.............#",
+     "#..##...C#....##...##..#",
+     "#..##.........##...##..#",
+     "#.......H..............#",
+     "#..ww....###.....T.....#",
+     "#........#X#...........#",
+     "#..##....#.#.....##....#",
+     "#..##.$........e.##..C.#",
+     "#..........##..........#",
+     "#..A...T...##....##....#",
+     "#................##..e.#",
+     "#S..ww.........G.......#",
+     "########################"
+    ]
+   },
+   "allies": [],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "moto",
+      "moto"
+     ],
+     "difficulty": "easy"
+    },
+    {
+     "trigger": {
+      "reached": true
+     },
+     "tanks": [
+      "moto",
+      "moto",
+      "m1"
+     ],
+     "difficulty": "easy"
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "reach",
+     "label": "Reach the collapsed overpass (X)"
+    },
+    {
+     "kind": "destroyTargets",
+     "label": "Destroy the two raider generators"
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Destroy every raider"
+    },
+    {
+     "kind": "caches",
+     "label": "Find the hidden Scrap caches",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 15
+  },
+  {
+   "id": "a1m2",
+   "act": 1,
+   "title": "Bridge Run",
+   "location": "Jersey City",
+   "brief": [
+    "A captive Oracle is held on the south bank, past the broken bridges.",
+    "Drive over her to pick her up, then bring her back to the extraction point (E).",
+    "Guided missiles (G) can be steered around corners: fire with F or right-click, steer with A/D."
+   ],
+   "debrief": "She says the gang that took your fiancée flies a skull banner. They headed for Chicago.",
+   "map": {
+    "id": "a1m2",
+    "name": "Bridge Run",
+    "cell": 10,
+    "rows": [
+     "##########################",
+     "#S....E.......##.........#",
+     "#.............##...e.....#",
+     "#..##...H.....##.........#",
+     "#..##.........##....##...#",
+     "#.............##....##...#",
+     "#....G.....#......#......#",
+     "#ww..###w###.####.###w#ww#",
+     "#....#.................#.#",
+     "#..........##.....R......#",
+     "#..e.......##......##....#",
+     "#..##..............##..Q.#",
+     "#..##.....C#....e........#",
+     "#S..........G....A.......#",
+     "##########################"
+    ]
+   },
+   "allies": [],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 45
+     },
+     "tanks": [
+      "moto",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "cleared": 0
+     },
+     "tanks": [
+      "m1",
+      "moto",
+      "moto"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "rescue",
+     "label": "Bring the Oracle to extraction (E)"
+    },
+    {
+     "kind": "parTime",
+     "label": "Finish within 4 minutes",
+     "seconds": 240,
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 20
+  },
+  {
+   "id": "a1m3",
+   "act": 1,
+   "title": "Jersey Scrapyard",
+   "location": "Newark",
+   "brief": [
+    "The Bone Riders run their motorcycle tanks out of this scrapyard.",
+    "One of the Oracle's guards has offered to ride with you. Keep him alive and he'll keep you alive.",
+    "Light tanks are fast but fragile. Heavy tanks shrug off small arms. Pick your fights."
+   ],
+   "debrief": "The Bone Riders scatter. Your wingman grins: 'Chicago's that way.'",
+   "map": {
+    "id": "a1m3",
+    "name": "Jersey Scrapyard",
+    "cell": 10,
+    "rows": [
+     "########################",
+     "#S.....w.......w......e#",
+     "#..##.....##.......##..#",
+     "#..##..H..##...C#..##..#",
+     "#......................#",
+     "#.w..##....ww....##..w.#",
+     "#....##..........##....#",
+     "#..R......#..#......G..#",
+     "#....##..........##....#",
+     "#.w..##....ww....##..w.#",
+     "#......................#",
+     "#..##..A..##...$...##..#",
+     "#..##.....##.......##..#",
+     "#S.....w.......w......e#",
+     "########################"
+    ]
+   },
+   "allies": [
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "moto",
+      "moto",
+      "moto",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "cleared": 0
+     },
+     "tanks": [
+      "moto",
+      "moto",
+      "moto",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "cleared": 1
+     },
+     "tanks": [
+      "goliath",
+      "moto",
+      "moto"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "destroyAll",
+     "label": "Wipe out the Bone Riders"
+    },
+    {
+     "kind": "caches",
+     "label": "Find the hidden Scrap cache",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 20
+  },
+  {
+   "id": "a1m4",
+   "act": 1,
+   "title": "Pennsylvania Turnpike",
+   "location": "Harrisburg",
+   "brief": [
+    "The turnpike is the only road west that's still standing — and everyone knows it.",
+    "Hold the toll plaza for ninety seconds while your convoy gets through, then clear what's left.",
+    "Enemies come from every corner. Use the walls; rubble slows you down."
+   ],
+   "debrief": "The convoy is through. Next stop: Chicago.",
+   "map": {
+    "id": "a1m4",
+    "name": "Pennsylvania Turnpike",
+    "cell": 10,
+    "rows": [
+     "##########################",
+     "#e.........w....w.......e#",
+     "#..##..##........##..##..#",
+     "#..##..##...H....##..##..#",
+     "#..........#....#........#",
+     "#wwww...ww...##...ww...www",
+     "#....................A...#",
+     "#S.......G.......R.......#",
+     "#........................#",
+     "#wwww...ww...##...ww..wwww",
+     "#..........#....#........#",
+     "#..##..##....D...##..##..#",
+     "#..##..##.C......##..##..#",
+     "#e.........w....w.......e#",
+     "##########################"
+    ]
+   },
+   "allies": [
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 20
+     },
+     "tanks": [
+      "moto",
+      "moto",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 45
+     },
+     "tanks": [
+      "m1",
+      "m1",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 70
+     },
+     "tanks": [
+      "goliath",
+      "m1",
+      "m1"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "survive",
+     "label": "Hold the plaza for 90 seconds",
+     "seconds": 90
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Destroy every attacker"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 25
+  },
+  {
+   "id": "a1m5",
+   "act": 1,
+   "title": "Steel Mill",
+   "location": "Pittsburgh",
+   "brief": [
+    "The mill still runs — the Rust Saints use it to forge armour plate.",
+    "Three generators keep it going. Their gun emplacements (sentries) cover the yard.",
+    "Knock out the generators. Turrets can be destroyed too, if they're in your way."
+   ],
+   "debrief": "The mill goes dark. Somewhere a foreman swears in three languages.",
+   "map": {
+    "id": "a1m5",
+    "name": "Steel Mill",
+    "cell": 10,
+    "rows": [
+     "##########################",
+     "#S......#....u....#.....e#",
+     "#.......#.........#......#",
+     "#..##...###.TT.####..##..#",
+     "#..##..........H.....##..#",
+     "#........u.......u.......#",
+     "#..ww...##..C.##.....ww..#",
+     "#..ww...##....##..T..ww..#",
+     "#.G.....................e#",
+     "#S..##...A......##...$...#",
+     "##########################"
+    ]
+   },
+   "allies": [
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "inferno",
+      "inferno"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 40
+     },
+     "tanks": [
+      "moto",
+      "moto",
+      "inferno"
+     ]
+    },
+    {
+     "trigger": {
+      "targetsDown": true
+     },
+     "tanks": [
+      "goliath",
+      "inferno",
+      "m1"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "destroyTargets",
+     "label": "Destroy the three generators"
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Rout the Rust Saints"
+    },
+    {
+     "kind": "destroyTurrets",
+     "label": "Silence every gun emplacement",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 25
+  },
+  {
+   "id": "a1m6",
+   "act": 1,
+   "title": "Chicago Loop",
+   "location": "Chicago",
+   "brief": [
+    "The river splits the Loop in two. Only two bridges are still up.",
+    "Skull-flag tanks hold the north bank. Hovers can cross the water; nothing else can.",
+    "Clear them out — your wingman will take the second bridge if you take the first."
+   ],
+   "debrief": "Chicago is quiet. A captured raider talks: the skull banner went west, toward the lake.",
+   "map": {
+    "id": "a1m6",
+    "name": "Chicago Loop",
+    "cell": 10,
+    "rows": [
+     "############################",
+     "#S.....##.......##.......e.#",
+     "#......##..H....##.........#",
+     "#..##.......##.......##....#",
+     "#..##...w...##...w...##..R.#",
+     "#~~~~~~..~~~~~~~~~..~~~~~~~#",
+     "#~~~~~~..~~~~~~~~~..~~~~~~~#",
+     "#...G....##.....C#.........#",
+     "#..##....##..D...#...##....#",
+     "#..##.......##.......##..e.#",
+     "#S..........##.....$.....e.#",
+     "############################"
+    ]
+   },
+   "allies": [
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "moto",
+      "moto",
+      "rattler"
+     ]
+    },
+    {
+     "trigger": {
+      "cleared": 0
+     },
+     "tanks": [
+      "rattler",
+      "rattler",
+      "m1",
+      "hover"
+     ]
+    },
+    {
+     "trigger": {
+      "cleared": 1
+     },
+     "tanks": [
+      "goliath",
+      "hover",
+      "hover",
+      "moto"
+     ],
+     "difficulty": "normal"
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "destroyAll",
+     "label": "Clear the Loop"
+    },
+    {
+     "kind": "caches",
+     "label": "Find the hidden cache",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 25
+  },
+  {
+   "id": "a1m7",
+   "act": 1,
+   "title": "Lake Shore Siege",
+   "location": "Chicago lakefront",
+   "brief": [
+    "The Oracle you rescued has friends here. Their compound is about to be overrun.",
+    "Hold the compound for two minutes. Then finish whoever's left.",
+    "Attackers come from all four corners. Use the inner walls."
+   ],
+   "debrief": "The compound holds. Its people pledge two tanks to your cause.",
+   "map": {
+    "id": "a1m7",
+    "name": "Lake Shore Siege",
+    "cell": 10,
+    "rows": [
+     "##########################",
+     "#e.........w..w.........e#",
+     "#..##..##........##..##..#",
+     "#..##..##..wwww..##..##..#",
+     "#.........w....w.........#",
+     "#...H.....w.S..w.....A...#",
+     "#.........w.S..w.........#",
+     "#..##..##..wwww..##..##..#",
+     "#..##..##...C....##..##..#",
+     "#e.........w..w....D....e#",
+     "##########################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "goliath"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "moto",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 25
+     },
+     "tanks": [
+      "rattler",
+      "rattler",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 55
+     },
+     "tanks": [
+      "goliath",
+      "inferno",
+      "moto",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 90
+     },
+     "tanks": [
+      "rhino",
+      "m1",
+      "m1",
+      "rattler"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "survive",
+     "label": "Hold the compound for 2 minutes",
+     "seconds": 120
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Break the siege"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 30
+  },
+  {
+   "id": "a1m8",
+   "act": 1,
+   "title": "Plains Crossing",
+   "location": "Iowa",
+   "brief": [
+    "Open farmland. Nowhere to hide, and the Echo Company has artillery.",
+    "Sentinels lob shells over cover — close the distance fast, or flank them.",
+    "Reach the grain depot (X) to signal the convoy, then clean up."
+   ],
+   "debrief": "The convoy rolls through the corn at dusk. Next: the mountains.",
+   "map": {
+    "id": "a1m8",
+    "name": "Plains Crossing",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S...........................#",
+     "#..w......#.........#.....e..#",
+     "#..w......#....H....#........#",
+     "#.....G.......................",
+     "#.........ww.....ww.....X....#",
+     "#..A.......................e.#",
+     "#.....#.........C#...........#",
+     "#S....#...............R....e.#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "sentinel",
+      "sentinel",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "reached": true
+     },
+     "tanks": [
+      "sentinel",
+      "rattler",
+      "rattler",
+      "m1"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "reach",
+     "label": "Reach the grain depot (X)"
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Destroy the artillery company"
+    },
+    {
+     "kind": "parTime",
+     "label": "Finish within 5 minutes",
+     "seconds": 300,
+     "optional": true
+    }
+   ],
+   "reward": 25
+  },
+  {
+   "id": "a1m9",
+   "act": 1,
+   "title": "Rockies Pass",
+   "location": "Colorado",
+   "brief": [
+    "Raiders spotted you at the pass and sent runners to warn the Warlord's fortress.",
+    "Two fast tanks are making for the tunnels (O). If either gets through, the fortress will be ready for you.",
+    "Stop the runners. Everything else can wait."
+   ],
+   "debrief": "No word reaches the fortress. You still have surprise on your side.",
+   "map": {
+    "id": "a1m9",
+    "name": "Rockies Pass",
+    "cell": 10,
+    "rows": [
+     "############################",
+     "#S.....####......####....O.#",
+     "#......####..H...####......#",
+     "#..e.........##..........R.#",
+     "#######..###.##.###..#######",
+     "#######..###....###..#######",
+     "#..G.....###....###.....e..#",
+     "#........##..C...##........#",
+     "#S..................A....O.#",
+     "############################"
+    ]
+   },
+   "allies": [],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "moto",
+      "rattler"
+     ],
+     "runner": true,
+     "difficulty": "normal"
+    },
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "m1"
+     ]
+    },
+    {
+     "trigger": {
+      "after": 30
+     },
+     "tanks": [
+      "goliath",
+      "moto"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "stopRunners",
+     "label": "Stop the runners before they reach a tunnel (O)"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 30
+  },
+  {
+   "id": "a1m10",
+   "act": 1,
+   "title": "Las Vegas Strip",
+   "location": "Las Vegas",
+   "brief": [
+    "Two Oracles are reported held on the Strip. One of them is the Warlord's bait.",
+    "Drive over a captive to pick her up and bring her to extraction (E).",
+    "If it's a trap, you'll know."
+   ],
+   "debrief": "The real captive knows the fortress layout. The Warlord's base is in the Mojave.",
+   "map": {
+    "id": "a1m10",
+    "name": "Las Vegas Strip",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S..#.##.#..H...#.##.#....#.e#",
+     "#...#.##.#......#.##.#..R.#..#",
+     "#..E.................Q.......#",
+     "#...####..####..####..####...#",
+     "#...####..####..####..####...#",
+     "#.G......w...C.....w......D..#",
+     "##.####..##..#.##.#..##..###.#",
+     "#S......L...#..e.#....Q.....e#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "moto",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "decoy": true
+     },
+     "tanks": [
+      "goliath",
+      "rhino",
+      "rattler",
+      "rattler"
+     ],
+     "difficulty": "normal"
+    },
+    {
+     "trigger": {
+      "after": 60
+     },
+     "tanks": [
+      "hover",
+      "hover"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "rescue",
+     "label": "Bring the real Oracle to extraction (E)"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 30,
+   "decoys": [
+    0
+   ]
+  },
+  {
+   "id": "a1m11",
+   "act": 1,
+   "title": "Mojave Fortress",
+   "location": "Mojave Desert",
+   "brief": [
+    "The Warlord's fortress: walls, gun emplacements, and two power cores behind them.",
+    "Destroy the cores to drop the defences. The Warlord will come out to meet you.",
+    "Its rear vents are weak — get behind it. Watch the ground: red rings mean incoming artillery."
+   ],
+   "debrief": "The Warlord's fortress burns. Its master fled for the coast — with your fiancée.",
+   "map": {
+    "id": "a1m11",
+    "name": "Mojave Fortress",
+    "cell": 10,
+    "rows": [
+     "############################",
+     "#S....##...u........u...e..#",
+     "#.....##..wwwwwwwwwwww.....#",
+     "#..H......w....TT....w..A..#",
+     "#.........w..........w.....#",
+     "#..##.....w...u..u...w.....#",
+     "#..##.....wwww....wwww...e.#",
+     "#.G.........................",
+     "#S.....C....R.......$....e.#",
+     "############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "m1"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "m1",
+      "inferno",
+      "moto"
+     ]
+    },
+    {
+     "trigger": {
+      "targetsDown": true
+     },
+     "tanks": [
+      "warlord",
+      "goliath"
+     ],
+     "boss": true,
+     "difficulty": "normal"
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "destroyTargets",
+     "label": "Destroy the fortress power cores"
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Defeat the Warlord and its guard"
+    },
+    {
+     "kind": "destroyTurrets",
+     "label": "Silence the gun emplacements",
+     "optional": true
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 40
+  },
+  {
+   "id": "a1m12",
+   "act": 1,
+   "title": "Golden Gate",
+   "location": "San Francisco",
+   "brief": [
+    "The end of the road. The Warlord has dug in on the bay with your fiancée as its prize.",
+    "Get her off the bridge and back to extraction (E) — then finish the Warlord for good.",
+    "Every phase it gets angrier. Keep moving."
+   ],
+   "debrief": "She is safe. The Long Road West is over — for now.",
+   "map": {
+    "id": "a1m12",
+    "name": "Golden Gate",
+    "cell": 10,
+    "rows": [
+     "##############################",
+     "#S...H....##......##.....e...#",
+     "#..E........................e#",
+     "#..##..R...##....##....##....#",
+     "#~~~~~~~~~~~..~~~~~..~~~~~~~~#",
+     "#~~~~~~~~~~~..~~~~~..~~~~~~~~#",
+     "#..##..G...##.Q..##..D.##....#",
+     "#.........................e..#",
+     "#S...A....##..C...##.....$...#",
+     "##############################"
+    ]
+   },
+   "allies": [
+    "m1",
+    "goliath"
+   ],
+   "waves": [
+    {
+     "trigger": "start",
+     "tanks": [
+      "warlord",
+      "rhino",
+      "m1"
+     ],
+     "boss": true,
+     "difficulty": "hard"
+    },
+    {
+     "trigger": {
+      "after": 45
+     },
+     "tanks": [
+      "hover",
+      "hover",
+      "rattler"
+     ]
+    }
+   ],
+   "objectives": [
+    {
+     "kind": "rescue",
+     "label": "Bring her to extraction (E)"
+    },
+    {
+     "kind": "destroyAll",
+     "label": "Defeat the Warlord"
+    },
+    {
+     "kind": "noDeaths",
+     "label": "Don't lose a tank",
+     "optional": true
+    }
+   ],
+   "reward": 60
+  }
+ ]
+}
