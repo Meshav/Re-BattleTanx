@@ -317,3 +317,11 @@ Went over all 223 TypeScript files. The structure is healthy: the largest source
 - `docs/14-map-authoring-guide.md`: map format and limits, full tile legend, destruction stages (intact / damaged / rubble) with heights and colours, editor rules, final art asset specs (three .glb per destructible), design guidelines, pre-share checklist.
 - `docs/map-templates/starter-yard.json`: 24×15 starter arena (4 spawns, fortresses a/b, water, walls, pickups); passes `checkMap`. Share code in doc 14.
 - All design docs (01–14 + README) now ship in the repo under `docs/`, in sync with the claude.ai project.
+
+## S32 — Docs reorganised and re-checked against the code (2026-10-22)
+- `docs/` is grouped by reader, keeping the 01–14 numbers so "doc NN" references still resolve: `design/` (01–08), `engineering/` (09, 12), `planning/` (10, 11, 13), `guides/` (14 + `map-templates/` + new `self-hosting.md`). `docs/README.md` is the index.
+- New `docs/guides/self-hosting.md`: Compose services, every environment variable, storage choice, sign-in setup, HTTP endpoints and limits, smoke test, running without Docker. The repo README now points there instead of carrying the detail.
+- Docs 02, 03, 04 and 07 got status lines and were checked line by line against `data/*.json` and the code. Corrected: pickup respawn timers (speed/cloak/teleport/repair are 40 s), plasma super shot (3-bolt fan), Queen's Guard signature (guided only), Reinforced Treads and Oracle's Champion downsides, no assist XP, daily challenges only (no weekly), challenge XP range 200–600, Act II title ("The Long Road East"), final mission name (Rift Spire), campaign scoring values and grade thresholds, boss details, death explosion deals no damage. Added the Warlord and Truck kinds and on-screen names to the roster table, and marked radar/points pickups, the Easy control scheme, hit markers, hit-stop, enemy damage scaling and the Battlelord campaign difficulty as not built.
+- Verified: 255 tests in 39 files pass; 254 TypeScript files; largest source file 193 lines; 40 SFX files.
+- Removed a stale `shortcut:` comment in `server/match/match.ts` that still said lag compensation and reconnect weren't built (S25, S26).
+- Repo-root README now explains the layout (`re-tanx/` is the game, `OLD/` is archived drafts).

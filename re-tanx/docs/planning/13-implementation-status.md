@@ -1,8 +1,8 @@
-# 13 — Implementation Status (as of S30, Oct 2026)
+# 13 — Implementation Status (as of S32, 22 Oct 2026)
 
-What the repo does today, measured against docs 01–12 and 14. Per-section detail is in the repo's `CHANGES_LOG.md` (S01–S30).
+What the repo does today, measured against docs 01–12 and 14. Per-section detail is in the repo's `CHANGES_LOG.md` (S01–S32).
 
-## Built and tested (255 automated tests + headless-browser checks per feature)
+## Built and tested (255 automated tests in 39 files, run 22 Oct 2026, + headless-browser checks per feature)
 | Area | Status |
 |------|--------|
 | Core sim | Deterministic 30 Hz sim. All tanks, guns, specials, pickups, destruction, rubble, water/hover |
@@ -19,7 +19,7 @@ What the repo does today, measured against docs 01–12 and 14. Per-section deta
 | Deploy | Dockerfile (server + Caddy web) + compose with MariaDB; built and run end-to-end on stand-in base images; `scripts/smoke-match.mjs` post-deploy check |
 | Legal | Original names replaced via `data/names.json`; `check-ip` guard in `npm run check` |
 
-## What S25–S30 added
+## What S25–S32 added
 | Section | Feature | Key facts |
 |---------|---------|-----------|
 | S25 | Hitscan lag compensation | 8-tick (250 ms) rewind; client sends `view` tick; clamped; bots shoot in the present; replay-safe |
@@ -27,7 +27,9 @@ What the repo does today, measured against docs 01–12 and 14. Per-section deta
 | S27 | Match history | MariaDB `matches` + `match_players` (new columns via `ADD COLUMN IF NOT EXISTS`); `GET /history` (Bearer token, own matches only); menu view |
 | S28 | Quick match | Fullest open public lobby or a new one; auto-start 30 s alone / 15 s with company / 3 s full; ranked waits for 2 |
 | S29 | Convoy | 3 trucks (tank kind `truck`) on an A* road; roll only with a protector within 25 m; 150 s rounds, sides swap, most deliveries wins; bot escort/ambush roles |
-| S30 | Docs | Docs 05–13 rewritten against the code; doc 14 map authoring guide + "Starter Yard" template; docs shipped in the repo under `docs/` |
+| S30 | Docs | Docs 05–13 rewritten against the code |
+| S31 | Map authoring | Doc 14 map authoring guide + "Starter Yard" template; docs shipped in the repo under `docs/` |
+| S32 | Docs reorganised | `docs/` split into `design/`, `engineering/`, `planning/`, `guides/`; docs 02/03/04/07 checked against the data files; self-hosting guide; READMEs rewritten |
 
 ## Open items
 - **Pick a final game title** (still "Re-Tanx") in `data/names.json` + `index.html`.

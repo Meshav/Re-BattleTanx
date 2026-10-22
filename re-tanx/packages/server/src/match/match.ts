@@ -5,7 +5,6 @@ import {
 import { createQueue, nextInput, type InputQueue } from "./inputs.ts";
 import { send, type Client } from "../client.ts";
 
-// shortcut: no hitscan lag compensation (doc 09 §9.4) and no mid-match reconnect; add when real-latency playtests ask for it
 const SNAP_HZ = 20;
 const FULL_EVERY_TICKS = 30;
 

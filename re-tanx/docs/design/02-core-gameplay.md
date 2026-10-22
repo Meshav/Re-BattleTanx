@@ -1,5 +1,7 @@
 # 02 — Core Gameplay
 
+> **Status (Oct 2026, S32):** movement, damage, weapons, pickups and structures are built as described below; the tables were checked against `data/tanks.json` and `data/rules.json`. Items marked ⏳ are design only.
+
 ## 2.1 Tank movement
 Arcade model, not physics-sim. Kinematic controller with simple collision response.
 
@@ -24,26 +26,29 @@ Original had four; we keep the concept, adapted for keyboard/mouse, gamepad, and
 | **Arcade** (default KB/M) | WASD | Mouse-aim, independent | PC players |
 | **Classic** | Stick/WASD | Locked forward; small auto-aim cone | N64 feel, new players |
 | **Twin-stick** (default gamepad) | Left stick | Right stick | Controllers |
-| **Easy** | Left stick moves in camera-relative direction (tank auto-turns) | Auto-aims nearest target in cone | Kids / Family Mode / touch |
+| **Easy** ⏳ | Left stick moves in camera-relative direction (tank auto-turns) | Auto-aims nearest target in cone | Kids / Rookie / touch |
 
-Rebindable. Gamepad via the Gamepad API. Touch: dual virtual sticks + fire/special buttons.
+Built ✅: Arcade (keyboard + mouse, player 1), Classic (arrow keys, a second keyboard player), Twin-stick (up to 4 gamepads via the Gamepad API) and touch (two virtual sticks, push the aim stick to the rim to auto-fire, plus Fire / Special / Next / Camera buttons; auto-selected on phones and tablets). ⏳ The Easy scheme.
 
-**Default bindings (KB/M):** WASD move · Mouse aim · LMB main gun · RMB special · Q/E cycle special · Tab cycle tank (where mode allows) · Space handbrake/boost (if boost held) · V camera toggle · Shift steer guided missile (hold).
+Player 1's keys are rebindable in Settings (move, fire, special, previous/next special, camera).
+
+**Default bindings (KB/M):** WASD move · Mouse aim · LMB or Space main gun · RMB or F special · Q/E cycle special · V camera · Esc pause. Hover tanks: A/D strafe and the hull turns to face the aim. Guided missile: the hull freezes and the steering keys fly the missile. ⏳ Tank cycling and a handbrake/boost key.
 
 ## 2.3 Camera
-- **Chase cam** (default): behind and above, smoothed follow, looks toward turret aim.
-- **Hatch cam**: first-person from the commander's hatch (original had this).
-- **Tactical cam** *(Enhancement)*: higher, slightly top-down; better on mobile.
-- Camera pushes in when occluded; buildings between camera and tank fade to 30% opacity.
-- Guided missile: camera switches to missile while steering; tank keeps last input (vulnerable).
+- **Chase cam** ✅ (default): behind and above the hull, smoothed follow.
+- **Cockpit cam** ✅ (the original's hatch view): just behind and above the turret hatch, follows the hull so mouse aim doesn't spin it.
+- **Top-down cam** ✅ *(Enhancement)*: high and slightly tilted (the "tactical" rig); better on mobile.
+- V (or a gamepad's Back button, `.` for the arrow-key player) cycles chase → cockpit → top-down.
+- Buildings between camera and tank fade ✅. ⏳ Camera push-in when occluded.
+- Guided missile ✅: camera switches to the missile while steering; the hull is frozen (vulnerable).
 
 ## 2.4 Health, armor, damage
 - Each tank has **HP** and an **armor value** (flat reduction per hit, min 1 damage).
 - **Directional armor** *(Enhancement, light)*: rear hits ×1.3, side ×1.1, front ×1.0. Rewards flanking without sim complexity.
 - **Splash**: explosives use linear falloff from center to radius.
-- **Death**: tank explodes (splash 6 m, 20 dmg), drops a **Star** pickup and its held special (if any).
+- **Death**: tank explodes (a 6 m visual blast, no damage), drops a **Star** pickup and its selected special stack as loot (both fade after 20 s).
 - **Self-damage**: 50% from own splash.
-- **Friendly fire**: off by default; on in "Hardcore" lobby option.
+- **Friendly fire**: off. Suicides and team kills cost a point in kill-count modes. ⏳ "Hardcore" lobby option.
 
 ## 2.5 Weapons model
 Every tank has:
@@ -69,16 +74,19 @@ Core to the identity. Three tiers:
 | **Structures** | Shops, walls, kiosks, small buildings | HP pool; staged collapse (intact → damaged → rubble); rubble is passable but slows |
 | **Landmarks** | Tall buildings, bridges | Partial destruction only (facade chunks); some scripted full collapses in campaign |
 
-- Destruction is **server-authoritative** and synced as state changes (object ID + stage), not physics.
-- Secret paths: walls marked `hiddenPath` open routes when destroyed.
-- Destruction resets each match.
+As built ✅: the **Structures** tier — `#` buildings (300 HP) and `w` walls (120 HP, about three hits), three stages each (intact → damaged at 50% → rubble), rubble passable at 60% speed (hovers aren't slowed). Campaign targets (220 HP) and the Siege core (2500 HP) use the same stages. ⏳ Debris props and Landmarks wait for the art kit (doc 14 §6).
+
+- Destruction is **server-authoritative** and synced as state changes (structure index + stage), not physics. ✅
+- Secret paths: a single `w` wall blocking a shortcut between lanes; destroying it opens the route (doc 14 §7). ✅
+- Destruction resets each match. ✅
 
 ## 2.8 HUD
 - Health bar + armor pips, current tank icon, squad roster (5 slots with alive/dead state).
 - Special inventory carousel with counts and SUPER badge.
 - Radar/minimap (always on in MP; pickup in campaign).
 - Objective tracker (QueenLord status, convoy progress, kills to win).
-- Hit markers, damage direction indicators, kill feed.
+- Kill feed ✅; status line (burn / stun / cloak / boost / repair) and a heat gauge for lasers ✅; boss health bar with phase ✅. ⏳ Hit markers, damage direction indicators.
+- Compact layout on small screens; one HUD per split-screen viewport. ✅
 
 ## 2.9 Feel / juice checklist
-Screen shake scaled to distance, muzzle flash, track marks, smoke at low HP, chunky explosions, satisfying building collapse sound, hit-stop of 40 ms on kills. Snappy beats realistic.
+✅ Screen shake scaled to distance (off with reduced motion), muzzle flash and tracers, chunky explosions, building crumble/collapse sounds, nuke flash. ⏳ Track marks, smoke at low HP, 40 ms hit-stop on kills. Snappy beats realistic.

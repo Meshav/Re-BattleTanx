@@ -2,7 +2,7 @@
 
 This is the doc to build from. It narrows doc 09 to the **smallest stack that ships the game**, then lays out phases with checklists. Each phase ends with something playable. Code shape and conventions are in **doc 12**.
 
-> **Progress (Oct 2026):** the repo was built in 30 sections (S01–S30; see `CHANGES_LOG.md`). Checkboxes below reflect the repo. `[~]` = partly built (the note says what's missing).
+> **Progress (Oct 2026):** the repo was built in 32 sections (S01–S32; see `CHANGES_LOG.md`). Checkboxes below reflect the repo. `[~]` = partly built (the note says what's missing).
 
 ## 11.1 Recommended stack
 
@@ -34,7 +34,7 @@ re-tanx/
     client/     # Three.js render, input, HUD, audio, split-screen, net client, editor
     server/     # ws + http, lobbies, quick match, matches at 30 Hz, auth, persistence
   data/         # tanks, specials, pickups, gangs, ai, modes, rules, progression, audio, names, maps/, campaign/
-  docs/         # these design docs (01–14) + map templates
+  docs/         # design/ engineering/ planning/ guides/ (index: docs/README.md) + map templates
   sql/          # schema.sql (applied on boot)
   scripts/      # rule checks, IP guard, audio generator, Act II builder, smoke match
   Dockerfile, docker-compose.yml, Caddyfile

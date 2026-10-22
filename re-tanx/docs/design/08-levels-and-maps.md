@@ -15,7 +15,7 @@
 ## 8.2 Multiplayer map list (launch target: 8)
 | Map | Theme | Size | Status | Highlights |
 |-----|-------|------|--------|-----------|
-| Graybox | Test grid | M | ✅ | 4 fortresses, 2-cell streets |
+| Graybox Grid | Test grid | M | ✅ | 4 fortresses, 2-cell streets |
 | Fortress Twin | Symmetric bases | M | ✅ | Built for Oracle Raid; **rail cannon** tracks auto-placed beside each fortress |
 | Neon Strip | Las Vegas | L | ✅ | |
 | Bay Span | SF bridge + piers | L | ✅ | Water (Hover advantage) |

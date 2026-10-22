@@ -17,13 +17,13 @@ The originals had no persistent progression. Add a **simple, honest** system tha
   | Action | XP |
   |--------|----|
   | Kill | 50 |
-  | Assist | 20 |
-  | Objective (Oracle capture, convoy delivery, zone tick) | 100 |
+  | Assist ⏳ | — (assists aren't tracked) |
+  | Objective (Oracle capture; each campaign objective done) | 100 |
   | Match complete | 150 |
   | Match win | +100 |
-  | Campaign mission | 300 + grade bonus (S +300, A +200, B +100) |
+  | Campaign mission (won) | 300 + grade bonus (S +300, A +200, B +100) |
   | First win of the day | +500 |
-  | Challenges | 200–1000 |
+  | Challenges | 200–600 (`data/progression.json → challenges.pool`) |
 
 - Bot-only matches give 50% XP (prevents farming).
 - Online: the server computes XP from the authoritative world. A player who leaves early earns no XP (but is still rated in ranked, §7.10).
@@ -55,19 +55,19 @@ Up to 3 slots. Each perk has a cost so you can't stack every upside.
 | Perk | Upside | Downside |
 |------|--------|----------|
 | Scavenger | Stars give +1 extra special | −10% max HP |
-| Reinforced Treads | +20% ram damage, knockback resistant | −5% speed |
+| Reinforced Treads | +20% ram damage | −5% speed |
 | Quick Loader | +12% main gun fire rate | −15% special stack max |
 | Field Medic | Health pickups +30% | Shield pickups −30% |
 | Ghost Engine | Quieter (AI hearing −50%) | −10% armor |
 | Demolitionist | +50% damage to structures | −10% damage to tanks |
 | Last Stand | At <20% HP, +25% damage | Take +10% damage overall |
-| Oracle's Champion | +10% speed while carrying an Oracle | Carrier pinged more often |
+| Oracle's Champion | +10% speed while carrying an Oracle | −5% max HP |
 
-Perks are **off** in Ranked and "Classic" lobbies; a host toggle elsewhere.
+Perks are **off** in Ranked and "Classic" lobbies; a host toggle elsewhere. Ghost Engine's upside shows on screen as "Bots hear you at half range".
 
 ## 7.6 Challenges ✅
-- **Daily** (3) and **Weekly** (3), generated from a seeded rotation and advanced by match stats.
-- ⏳ **Achievements** (one-time).
+- **Daily** (3): the same set for everyone each UTC day, picked from a pool of 8 by a seeded rotation and advanced by match stats (kills, structures, matches, wins, Oracles, specials, pickups, missions).
+- ⏳ **Weekly** challenges and one-time **Achievements**.
 
 ## 7.7 Campaign progression ✅
 - Best grade per mission. Scrap (Tank Bucks) carries between missions. 24 missions across two acts unlock in order.

@@ -12,23 +12,49 @@ Fast, arcade tank combat in destructible post-apocalyptic cities. Pick a gang, r
 4. **Short sessions** — a match is 3–8 minutes; a campaign mission 5–10.
 5. **Progression is flavor, not power** — leveling unlocks options, never a stat wall in PvP.
 
-## Document index
+## How the docs are organised
+Docs keep their original numbers (01–14) so "doc 09 §9.4" style references keep working, and are grouped by who reads them:
+
+| Folder | For | Contents |
+|--------|-----|----------|
+| [`design/`](design/) | Game design: what the game is and how it should feel | 01–08 |
+| [`engineering/`](engineering/) | How it's built: netcode, data, module maps, code rules | 09, 12 |
+| [`planning/`](planning/) | Where it stands: roadmap, phased plan, status | 10, 11, 13 |
+| [`guides/`](guides/) | How-tos for people doing a job: making maps, self-hosting | 14, self-hosting, map templates |
+
+Every doc marks what's built against the repo (✅ built and tested · ⏳ planned). Per-section history is in the repo's [`CHANGES_LOG.md`](../CHANGES_LOG.md) (S01–S32).
+
+### Design
 | # | File | Covers |
 |---|------|--------|
-| 01 | [original-game-reference.md](01-original-game-reference.md) | What the originals actually had — the baseline to port |
-| 02 | [core-gameplay.md](02-core-gameplay.md) | Movement, turret, camera, damage, controls, pickups, destruction |
-| 03 | [tanks-and-weapons.md](03-tanks-and-weapons.md) | Tank roster, gangs, weapons, power-ups, balance numbers |
-| 04 | [single-player-campaign.md](04-single-player-campaign.md) | Campaign structure, missions, Tank Bucks, co-op |
-| 05 | [multiplayer.md](05-multiplayer.md) | All modes (incl. Convoy), lobbies, quick match, ranked, rejoin, history, anti-cheat |
-| 06 | [ai-behavior.md](06-ai-behavior.md) | Bot AI: architecture, archetypes, mode roles, difficulty — with build status |
-| 07 | [progression-leveling.md](07-progression-leveling.md) | XP, levels, unlocks, perks, ranked rating, PvP fairness rules |
-| 08 | [levels-and-maps.md](08-levels-and-maps.md) | Map rules, map format as built, arenas, map editor |
-| 09 | [technical-architecture.md](09-technical-architecture.md) | **As built**: netcode, lag compensation, rejoin, topology, data model, testing, replays |
-| 10 | [roadmap.md](10-roadmap.md) | Milestones with status |
-| 11 | [implementation-plan.md](11-implementation-plan.md) | Stack + phased checklists (ticked against the repo) |
-| 12 | [code-architecture.md](12-code-architecture.md) | **Code shape**: real module maps, enforced rules, definition of done |
-| 13 | [implementation-status.md](13-implementation-status.md) | **What's built right now** and what's open |
-| 14 | [map-authoring-guide.md](14-map-authoring-guide.md) | **Making arenas**: format, tile legend, destruction stages, art asset specs, design checklist, starter template |
+| 01 | [original-game-reference.md](design/01-original-game-reference.md) | What the originals actually had — the baseline to port |
+| 02 | [core-gameplay.md](design/02-core-gameplay.md) | Movement, turret, cameras, damage, controls, pickups, destruction, HUD |
+| 03 | [tanks-and-weapons.md](design/03-tanks-and-weapons.md) | Tank roster (with on-screen names), gangs, specials, power-ups, live numbers |
+| 04 | [single-player-campaign.md](design/04-single-player-campaign.md) | Campaign structure, Scrap economy, missions, bosses, co-op, scoring |
+| 05 | [multiplayer.md](design/05-multiplayer.md) | All modes (incl. Convoy), lobbies, quick match, ranked, rejoin, history, anti-cheat |
+| 06 | [ai-behavior.md](design/06-ai-behavior.md) | Bot AI: architecture, archetypes, mode roles, difficulty — with build status |
+| 07 | [progression-leveling.md](design/07-progression-leveling.md) | XP, levels, unlocks, perks, challenges, ranked rating, PvP fairness |
+| 08 | [levels-and-maps.md](design/08-levels-and-maps.md) | Map design rules, map format as built, arenas, map editor |
+
+### Engineering
+| # | File | Covers |
+|---|------|--------|
+| 09 | [technical-architecture.md](engineering/09-technical-architecture.md) | **As built**: sim, netcode, lag compensation, rejoin, topology, data model, testing, replays |
+| 12 | [code-architecture.md](engineering/12-code-architecture.md) | **Code shape**: real module maps, enforced rules, definition of done |
+
+### Planning
+| # | File | Covers |
+|---|------|--------|
+| 10 | [roadmap.md](planning/10-roadmap.md) | Milestones with status and open questions |
+| 11 | [implementation-plan.md](planning/11-implementation-plan.md) | Stack + phased checklists (ticked against the repo) |
+| 13 | [implementation-status.md](planning/13-implementation-status.md) | **What's built right now** and what's open |
+
+### Guides
+| File | Covers |
+|------|--------|
+| [14-map-authoring-guide.md](guides/14-map-authoring-guide.md) | **Making arenas**: format, tile legend, destruction stages, art asset specs, design checklist |
+| [self-hosting.md](guides/self-hosting.md) | **Running a server**: Docker Compose, environment variables, storage, sign-in, HTTPS, smoke test |
+| [map-templates/](guides/map-templates/) | Starter arenas that pass every check (`starter-yard.json`) |
 
 ## Legal / IP note (read first)
 BattleTanx, its characters (Griffin Spade, Madison, Cassandra), gang names, and assets are owned by the rights holder of the 3DO catalog. To keep a fan project defensible:
@@ -55,6 +81,7 @@ This isn't legal advice; it lowers takedown risk but doesn't eliminate it.
 
 ## Conventions
 - Units: 1 unit = 1 meter. Time in seconds. Speeds in m/s.
-- Numbers in these docs are **starting values for tuning**; the live values are in the repo's `data/*.json`.
+- Numbers in these docs are **starting values for tuning**; the live values are in the repo's `data/*.json`. Where a doc table has been checked against the data it says so in its status line.
 - "Original:" callouts mark behavior lifted from the N64 games; "Enhancement:" marks new design.
 - ✅ = built and tested in the repo; ⏳ = planned, not built.
+- Internal ids in code (`moto`, `battlelord`, `queen`) are not what players see; on-screen names come from `data/names.json`.

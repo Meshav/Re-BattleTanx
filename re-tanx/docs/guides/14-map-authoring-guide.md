@@ -191,7 +191,7 @@ Passes every check. It has: 2 fortresses with open rail rows, 4 spawns, 2 water 
 ########################
 ```
 
-- **File:** `docs/map-templates/starter-yard.json` in the repo.
+- **File:** `docs/guides/map-templates/starter-yard.json` in the repo.
 - **Open it in the editor:** menu → Map editor → paste this code into **Map code** → Load. Or open `…/?map=<code>` on your server.
 
 ```
