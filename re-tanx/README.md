@@ -11,7 +11,7 @@ npm run dev        # client, http://localhost:5173 (proxies /ws, /auth, /leaderb
 npm run server     # game server for online play, :8787
 npm run check      # rules + IP-name guard + typecheck + tests (255)
 npm run build      # static client in packages/client/dist
-docker compose up --build  # Caddy on :8080 (client + proxy) + game server + MariaDB
+docker compose up --build  # web on :24873 (client + proxy) + game server + MariaDB
 ```
 Hosting, environment variables, storage and sign-in: [docs/guides/self-hosting.md](docs/guides/self-hosting.md).
 

@@ -1,8 +1,8 @@
 // Plays one short online match against bots through a running deployment, waits for the server's XP award, then checks match history.
-// Usage: node scripts/smoke-match.mjs ws://localhost:8080/ws
+// Usage: node scripts/smoke-match.mjs ws://localhost:24873/ws
 import { WebSocket } from "ws";
 
-const url = process.argv[2] ?? "ws://localhost:8080/ws";
+const url = process.argv[2] ?? "ws://localhost:24873/ws";
 const ws = new WebSocket(url);
 const seen = new Set();
 let seq = 0, timer, token;

@@ -5,9 +5,9 @@ How to run a Re-Tanx server for friends or a homelab. Everything here is built a
 ## 1. Quickest: Docker Compose
 ```bash
 git clone … && cd re-tanx
-docker compose up --build        # Caddy on :8080 (client + proxy) + game server + MariaDB
+docker compose up --build        # web on :24873 (client + proxy) + game server + MariaDB
 ```
-Open `http://<host>:8080`. Three services start:
+Open `http://<host>:24873`. Set `WEB_PORT` in `.env` if that host port is occupied. Three services start:
 
 | Service | Image | Role |
 |---------|-------|------|
@@ -27,6 +27,7 @@ Set these in a `.env` next to `docker-compose.yml` (Compose reads it) or in your
 | `DATABASE_URL` | No | `mysql://user:pass@host:3306/db`. Set → MariaDB store. Unset → one JSON file per player under `DATA_DIR` (plus `identities.json`, `matches.jsonl`) |
 | `DATA_DIR` | No | File-store directory (default `./data-store`; `/data` in the image, mount a volume) |
 | `PORT` | No | Game server port (default 8787) |
+| `WEB_PORT` | Compose only | Host port for the website (default 24873); Caddy listens on 8080 inside its container |
 | `SITE_ADDRESS` | No | Caddy site address. `:8080` (default) for plain HTTP behind another proxy; `game.example.com` for automatic HTTPS with Let's Encrypt |
 | `PUBLIC_URL` | For sign-in | The address players use (`https://game.example.com`). Needed for OAuth redirects |
 | `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` | Optional | Enables "Sign in with Discord" |

@@ -33,7 +33,7 @@ services:
   web:
     build: { context: ., target: web }
     depends_on: [game]
-    ports: ["8080:8080"]
+    ports: ["${WEB_PORT:-24873}:8080"]
     environment:
       SITE_ADDRESS: ":8080"
     restart: unless-stopped
