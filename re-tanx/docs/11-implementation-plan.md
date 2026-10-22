@@ -61,11 +61,14 @@ Durations assume one developer part-time; adjust to taste.
 - [ ] Fixed 30 Hz sim loop in `sim`, render interpolation in `client`
 - [ ] Input layer → `InputState` (keyboard/mouse + Gamepad API)
 - [ ] One medium tank: hull drive, independent turret, collision with walls
+- [x] Starting dashboard, Start/Escape pause and quit menu, basic telemetry and minimap ([doc 13](13-dashboard-and-hud.md))
+- [x] Launch briefing, cancellable 3/2/1/GO countdown, and no gameplay before launch completes ([checklist and next steps](14-implementation-checklist.md))
 - [ ] Main cannon: ballistic projectile, hit, damage, death, respawn
 - [ ] Chase camera with occlusion fade
 - [ ] Graybox grid map loaded from JSON
 - [ ] Destructible blocks: 3 stages (intact → damaged → rubble), rubble passable
 - [ ] Placeholder SFX (fire, hit, explode)
+- [ ] First approved original asset kit and model/audio integration; follow [asset inventory and compliance](15-asset-inventory-and-compliance.md)
 - [ ] Unit tests: movement step, damage + armor, structure stage changes
 
 **Exit:** driving and wrecking buildings is fun for 5 minutes. If not, fix feel before moving on.
@@ -78,7 +81,8 @@ Durations assume one developer part-time; adjust to taste.
 - [ ] Pickups with respawn timers; health storage when full
 - [ ] Death drops Star + held special
 - [ ] Gangs: 3 gangs, 5-tank rosters, signature items, roster cycling
-- [ ] HUD: health, roster, special carousel, SUPER badge, minimap, kill feed
+- [x] Basic HUD: health, speed, heading, coordinates, session time, minimap ([doc 13](13-dashboard-and-hud.md))
+- [ ] Combat HUD: roster, special carousel, SUPER badge, kill feed
 - [ ] Control schemes: Arcade, Twin-stick, Classic
 - [ ] Tests: super shot, pickup respawn, roster cycling
 

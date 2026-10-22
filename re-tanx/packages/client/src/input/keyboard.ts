@@ -1,9 +1,17 @@
 import type { InputState } from '@re-tanx/sim';
 
 const held = new Set<string>();
+let enabled = false;
+
+export function enableKeyboard(value: boolean): void {
+  enabled = value;
+  held.clear();
+}
 
 export function startKeyboard(): void {
-  addEventListener('keydown', (e) => held.add(e.code));
+  addEventListener('keydown', (e) => {
+    if (enabled) held.add(e.code);
+  });
   addEventListener('keyup', (e) => held.delete(e.code));
   addEventListener('blur', () => held.clear());
 }

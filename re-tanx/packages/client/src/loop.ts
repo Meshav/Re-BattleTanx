@@ -7,19 +7,23 @@ export interface Pose {
 }
 
 export interface LoopHooks {
+  isRunning(): boolean;
   readInputs(): Inputs;
   render(prev: ReadonlyMap<EntityId, Pose>, alpha: number): void;
 }
 
 /** Fixed-step sim at TICK_RATE; render at display rate, interpolating from the previous tick. */
-export function startLoop(world: World, hooks: LoopHooks): void {
+export function startLoop(world: World, hooks: LoopHooks): () => void {
   let prev = snapshotPoses(world);
   let accumulator = 0;
   let last = performance.now();
+  let frameId: number;
 
   function frame(now: number): void {
-    accumulator += Math.min((now - last) / 1000, 0.25); // clamp: a tab in the background doesn't fast-forward
+    const running = hooks.isRunning();
+    accumulator = running ? accumulator + Math.min((now - last) / 1000, 0.25) : 0;
     last = now;
+    if (!running) prev = snapshotPoses(world);
 
     while (accumulator >= TICK_DT) {
       prev = snapshotPoses(world);
@@ -27,10 +31,11 @@ export function startLoop(world: World, hooks: LoopHooks): void {
       accumulator -= TICK_DT;
     }
 
-    hooks.render(prev, accumulator / TICK_DT);
-    requestAnimationFrame(frame);
+    hooks.render(prev, running ? accumulator / TICK_DT : 1);
+    frameId = requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  frameId = requestAnimationFrame(frame);
+  return () => cancelAnimationFrame(frameId);
 }
 
 function snapshotPoses(world: World): Map<EntityId, Pose> {

@@ -27,6 +27,11 @@ Fast, arcade tank combat in destructible post-apocalyptic cities. Pick a gang, r
 | 10 | [roadmap.md](10-roadmap.md) | Milestones from prototype to 1.0 (high level) |
 | 11 | [implementation-plan.md](11-implementation-plan.md) | **Build from this**: chosen stack, phased checklists, upgrade triggers |
 | 12 | [code-architecture.md](12-code-architecture.md) | **Code shape**: module maps, lint-enforced limits, conventions, definition of done |
+| 13 | [dashboard-and-hud.md](13-dashboard-and-hud.md) | Implemented starting dashboard, pause/quit flow, player HUD, map, and verification |
+| 14 | [implementation-checklist.md](14-implementation-checklist.md) | Completed starting experience, launch countdown, verification, and small next steps |
+| 15 | [asset-inventory-and-compliance.md](15-asset-inventory-and-compliance.md) | Prioritized asset list, export budgets, rights checks, and acceptance process |
+
+Implementation history: [Change Log](CHANGES_LOG.md). Asset intake: [record template](asset-record-template.md).
 
 ## Legal / IP note (read first)
 BattleTanx, its characters (Griffin Spade, Madison, Cassandra), gang names, and assets are owned by the rights holder of the 3DO catalog. To keep a fan project defensible:

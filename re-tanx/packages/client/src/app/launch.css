@@ -1,0 +1,61 @@
+.launch-summary {
+  margin: 0 0 20px;
+  border-block: 1px solid var(--line);
+  padding: 16px 0;
+  display: grid;
+  gap: 12px;
+}
+.launch-summary > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.launch-summary dt {
+  font:
+    10px Consolas,
+    monospace;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+.launch-summary dd {
+  margin: 0;
+  font-size: 13px;
+  text-align: right;
+}
+#launch-game {
+  margin-top: 20px;
+}
+#launch-countdown {
+  text-align: center;
+  padding: 16px 0;
+}
+#launch-count {
+  font-size: clamp(72px, 16vw, 112px);
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+dialog > .launch-note {
+  margin-bottom: 0;
+}
+@media (max-height: 540px) {
+  #launch-menu {
+    padding: 20px;
+  }
+  #launch-menu h2 {
+    font-size: 28px;
+    margin: 8px 0;
+  }
+  #launch-description,
+  .launch-summary {
+    margin-bottom: 12px;
+  }
+  #launch-countdown {
+    padding: 0;
+  }
+  #launch-count {
+    font-size: 64px;
+  }
+}
