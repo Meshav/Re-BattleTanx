@@ -1,4 +1,4 @@
-import { maxHp, type SimEvent, type Tank, type Vec2, type World } from "@re-tanx/sim";
+import { maxHp, rules, type SimEvent, type Tank, type Vec2, type World } from "@re-tanx/sim";
 import manifest from "../../../../data/audio.json";
 import { settings } from "../settings/settings.ts";
 
@@ -172,6 +172,7 @@ export function playEvents(sfx: Sfx, events: SimEvent[], world: World, me: Tank)
       case "bossPhase": play(sfx, "boss_phase"); break;
       case "wave": play(sfx, "wave_start"); break;
       case "round": play(sfx, "round_end"); break;
+      case "countdown": if (e.left <= rules.countdown.digits) play(sfx, e.left ? "countdown_beep" : "countdown_go"); break;
       case "convoy": play(sfx, "queen_captured"); break;
       case "zone": play(sfx, "zone_move"); break;
       case "rail": if (e.tankId === me.id) play(sfx, e.what === "mount" ? "shield_up" : "ui_back"); break;

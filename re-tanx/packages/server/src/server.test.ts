@@ -61,7 +61,11 @@ describe("game server", () => {
     const first = await host.next("snap");
     if (first.t !== "snap") throw new Error();
     expect(first.snap.meta?.length).toBe(3);
-    const startPos = first.snap.tanks.find((t) => t.id === start.tankId)!.pos;
+    expect(first.snap.mode.countdown).toBeGreaterThan(0); // matches open with the count-in
+    let live: ServerMsg = first;
+    while (live.t === "snap" && live.snap.mode.countdown) live = await host.next("snap");
+    if (live.t !== "snap") throw new Error();
+    const startPos = live.snap.tanks.find((t) => t.id === start.tankId)!.pos;
     for (let seq = 1; seq <= 40; seq++) host.send({ t: "input", seq, input: { throttle: 1, steer: 0, aim: 0, fire: false, special: false, cycle: 0 } });
     await new Promise((r) => setTimeout(r, 900));
     const later = host.msgs.filter((m) => m.t === "snap").at(-1);
@@ -76,7 +80,7 @@ describe("game server", () => {
     const snapAfterLeave = await host.next("snap");
     expect(snapAfterLeave.t === "snap" && snapAfterLeave.snap.bots.length).toBe(2); // guest's tank is now a bot
     host.ws.close();
-  });
+  }, 15000);
 
   it("rejects joining a lobby that doesn't exist", async () => {
     const c = await connect();

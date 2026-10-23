@@ -20,7 +20,7 @@ export function createMatch(map: MapJson, settings: LobbySettings, members: Clie
   }));
   const seed = (Date.now() & 0x7fffffff) || 1;
   const slots = [...humans, ...bots];
-  const opts = { seed, perks: settings.perks, mode: { kind: settings.mode, ...(settings.scoreLimit > 0 ? { scoreLimit: settings.scoreLimit } : {}) } };
+  const opts = { seed, perks: settings.perks, mode: { kind: settings.mode, countdown: true, ...(settings.scoreLimit > 0 ? { scoreLimit: settings.scoreLimit } : {}) } };
   const world = createWorld(parseMap(map), slots, opts);
   world.lagComp = createLagComp();
   const seats = members.map((client, i) => ({ client, profileId: client.profileId, name: client.name, tankId: world.tanks[i]!.id, awayUntil: undefined, queue: createQueue(), sentStages: "", sentPickups: "", full: true }));

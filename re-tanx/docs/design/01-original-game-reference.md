@@ -1,11 +1,11 @@
 # 01 — Original Game Reference
 
-Baseline of what existed in the two N64 games. Items marked *(verify)* should be confirmed against gameplay footage before treating as canon.
+Baseline of what existed in the two N64 games. Items marked *(verify)* should be confirmed against gameplay footage before treating as canon. BattleTanx (1998) facts marked *(decomp)* were checked against the decompiled code: details and numbers in [doc 15](15-decomp-findings.md).
 
 ## BattleTanx (1998)
 **Setting.** 2001, post-apocalyptic US. A war and a virus left roughly one woman per thousand men; surviving women with special power ("the Edge") are **QueenLords**, protected by tank gangs. Player is **Griffin Spade**, a "Battlelord", fighting west from New York to San Francisco to rescue his fiancée **Madison**.
 
-**Campaign.** 17 levels across real US locations (New York, Chicago, Las Vegas, San Francisco, countryside). Short — the game was built multiplayer-first. Lives = reserve tanks; destroyed allied tanks can regenerate *(verify specifics)*.
+**Campaign.** 17 levels across real US locations *(decomp)*: New York ×5, Chicago ×3, Midwest Highway, Las Vegas ×2, Area 51, Desert, San Francisco ×4, of which 4 are city bonus levels. Short — the game was built multiplayer-first. Lives = reserve tanks; destroyed allied tanks can regenerate *(verify specifics)*. Every level opens with its title and a 3-2-1 countdown *(decomp)*.
 
 **Tanks (3).**
 | Tank | Role |
@@ -26,7 +26,7 @@ Baseline of what existed in the two N64 games. Items marked *(verify)* should be
 
 **Control schemes.** Easy, Driver, Gunner, Arcade — differing in whether the turret moves independently of the hull. Camera: third-person behind tank or first-person hatch view.
 
-**Weapons / items.** Main cannon (per tank), guided (remote-controlled) missiles that can be steered around corners, mines, cloak, auto sentry turrets, energy shields, nukes, swarm missiles, lasers *(verify full list)*. Some specials have a hidden **"super shot"**: fire with a large stockpile to dump all of it in one stronger blast.
+**Weapons / items.** Main cannon (per tank), guided (remote-controlled) missiles that can be steered around corners, mines, cloak, auto sentry turrets, energy shields, nukes, swarm missiles, lasers. Full 1998 pickup list *(decomp)*: Health, Ammo, Star, Nuke, Swarmers, Laser, Guided Missiles, Mines, Shields, Cloaking, Grenades, Smokescreen, Gun Buddies, Radar, Extra Tank, Bonus Points (Flamer is named but has no pickup effect). Some specials have a hidden **"super shot"**: fire with a large stockpile to dump all of it in one stronger blast.
 
 **Power-ups (series-wide).** Star (dropped by destroyed tanks; small health+ammo), Health, Ammo, Shield, Radar (always on in MP), Speed boost, Nuke, Bonus Points (campaign), 1UP (campaign).
 

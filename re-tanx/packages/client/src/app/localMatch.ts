@@ -33,7 +33,7 @@ export function startLocalMatch(cfg: MatchConfig, renderer: THREE.WebGLRenderer,
   const slots = toSlots(cfg, loadProfile().perks);
   const opts = {
     seed: (Date.now() & 0xffff) || 1, perks: cfg.perks === true,
-    mode: { kind: cfg.mode, ...(cfg.scoreLimit > 0 ? { scoreLimit: cfg.scoreLimit } : {}) },
+    mode: { kind: cfg.mode, countdown: true, ...(cfg.scoreLimit > 0 ? { scoreLimit: cfg.scoreLimit } : {}) },
   };
   const custom = customMap(map);
   const world = createWorld(parseMap(arenaFor(map)), slots, opts);

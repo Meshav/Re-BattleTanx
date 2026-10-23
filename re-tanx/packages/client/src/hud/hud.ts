@@ -4,6 +4,7 @@ import { renderRoster } from "./roster.ts";
 import { drawMinimap } from "./minimap.ts";
 import { pushKills, type KillFeed } from "./killFeed.ts";
 import { renderObjective } from "./objective.ts";
+import { renderCountdown } from "./countdown.ts";
 import { settings } from "../settings/settings.ts";
 
 /** DOM overlay. Built once; update() only touches text, widths and the radar canvas. */
@@ -12,7 +13,7 @@ export interface Hud {
   score: HTMLElement; center: HTMLElement; specials: HTMLElement; roster: HTMLElement;
   minimap: HTMLCanvasElement; feed: KillFeed; flash: HTMLElement; objective: HTMLElement; lastSpecials: string; lastRoster: string;
   heatBar: HTMLElement; heatFill: HTMLElement; status: HTMLElement; boss: HTMLElement; bossName: HTMLElement; bossFill: HTMLElement;
-  nextUpdate: number;
+  countdown: HTMLElement; nextUpdate: number;
 }
 
 export function createHud(root: HTMLElement, names: (id: number) => string): Hud {
@@ -31,6 +32,7 @@ export function createHud(root: HTMLElement, names: (id: number) => string): Hud
       <div class="status" data-status></div>
       <div class="hud-specials" data-specials></div></div>
     <div class="hud-center hidden" data-center></div>
+    <div class="hud-countdown hidden" data-countdown><div class="cd-title"></div><div class="cd-digit"></div></div>
     <div class="hud-flash" data-flash></div>`;
   const q = <T extends HTMLElement = HTMLElement>(s: string) => root.querySelector<T>(`[${s}]`)!;
   return {
@@ -39,7 +41,7 @@ export function createHud(root: HTMLElement, names: (id: number) => string): Hud
     score: q("data-score"), center: q("data-center"), specials: q("data-specials"), roster: q("data-roster"),
     minimap: q<HTMLCanvasElement>("data-minimap"), feed: { el: q("data-feed"), lines: [], names }, flash: q("data-flash"), objective: q("data-objective"),
     lastSpecials: "", lastRoster: "", heatBar: q("data-heat-bar"), heatFill: q("data-heat-fill"), status: q("data-status"),
-    boss: q("data-boss"), bossName: q("data-boss-name"), bossFill: q("data-boss-fill"),
+    boss: q("data-boss"), bossName: q("data-boss-name"), bossFill: q("data-boss-fill"), countdown: q("data-countdown"),
   };
 }
 
@@ -86,6 +88,7 @@ export function updateHud(h: Hud, me: Tank, world: World): void {
   drawMinimap(h.minimap, world, me);
   renderBoss(h, world);
   renderObjective(h.objective, world, me);
+  renderCountdown(h.countdown, world);
 }
 
 const STATUS: [keyof Tank["fx"], string][] = [["burn", "🔥 burning"], ["stun", "⚡ stunned"], ["cloak", "👁 cloaked"], ["boost", "» boost"], ["repair", "+ repairing"]];

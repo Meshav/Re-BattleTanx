@@ -12,13 +12,13 @@ export function predict(p: Prediction, world: World, me: Tank | undefined, input
   p.seq++;
   p.pending.push({ seq: p.seq, input });
   if (p.pending.length > 90) p.pending.shift(); // ~3 s: server is clearly not listening; don't grow forever
-  if (me?.alive) moveTank(world, me, input);
+  if (me?.alive && !world.mode.countdown) moveTank(world, me, input);
   return p.seq;
 }
 
 /** After a snapshot reset `me` to server state: drop acknowledged inputs, replay the rest. */
 export function reconcile(p: Prediction, world: World, me: Tank | undefined, ack: number): void {
   p.pending = p.pending.filter((e) => e.seq > ack);
-  if (!me?.alive) return;
+  if (!me?.alive || world.mode.countdown) return; // the server holds everyone still during the count-in
   for (const e of p.pending) moveTank(world, me, e.input);
 }

@@ -2,14 +2,14 @@
 
 A browser fan port inspired by BattleTanx (N64). Arcade tank combat in destructible grid cities: local split-screen, online play with an authoritative server, a 24-mission campaign, bots, progression, replays and a map editor.
 
-**Docs:** [`docs/`](docs/README.md) — [design](docs/design/) (01–08), [engineering](docs/engineering/) (09, 12), [planning](docs/planning/) (10, 11, 13) and [guides](docs/guides/) (map authoring, self-hosting). The code follows doc 11 (phases) and doc 12 (code rules); doc 13 says what's built. `CHANGES_LOG.md` has every section (S01–S32).
+**Docs:** [`docs/`](docs/README.md) — [design](docs/design/) (01–08, 15 decomp findings), [engineering](docs/engineering/) (09, 12), [planning](docs/planning/) (10, 11, 13) and [guides](docs/guides/) (map authoring, self-hosting). The code follows doc 11 (phases) and doc 12 (code rules); doc 13 says what's built. `CHANGES_LOG.md` has every section (S01–S35).
 
 ## Run
 ```bash
 npm install
 npm run dev        # client, http://localhost:5173 (proxies /ws, /auth, /leaderboard, /history to :8787)
 npm run server     # game server for online play, :8787
-npm run check      # rules + IP-name guard + typecheck + tests (255)
+npm run check      # rules + IP-name guard + typecheck + tests (265)
 npm run build      # static client in packages/client/dist
 docker compose up --build  # web on :24873 (client + proxy) + game server + MariaDB
 ```
@@ -52,7 +52,7 @@ Tech-debt ledger: `grep -rn "shortcut:" packages`.
 Brand assets live in `packages/client/public/branding/`: `logo-full.png` is the desktop menu logo, `logo-text.png` is the compact menu wordmark, and `icon.png` appears on the pause screen. The supplied black-background wordmark is retained as `logo-text-black.png`. The browser favicon is `packages/client/public/favicon.ico`.
 
 ## Audio
-All sounds are original placeholders, made from code by `node scripts/gen-audio.mjs` (music needs ffmpeg). They live in `packages/client/public/audio/`: 40 sound effects as `sfx/*.wav` and two music loops as `music/*.mp3`. To swap in a recorded sound, drop a file with the same name over the placeholder. Levels, pitch variation and the voice limit for each sound are set in `data/audio.json`. Event-to-sound mapping is in `packages/client/src/audio/sfx.ts`.
+All sounds are original placeholders, made from code by `node scripts/gen-audio.mjs` (music needs ffmpeg; `node scripts/gen-audio.mjs countdown_beep` rewrites just that sound). They live in `packages/client/public/audio/`: 42 sound effects as `sfx/*.wav` and two music loops as `music/*.mp3`. To swap in a recorded sound, drop a file with the same name over the placeholder. Levels, pitch variation and the voice limit for each sound are set in `data/audio.json`. Event-to-sound mapping is in `packages/client/src/audio/sfx.ts`.
 
 ## Legal
 Fan project, non-commercial, no ripped assets. Every original name is replaced on screen via `data/names.json` and guarded by `scripts/check-ip.mjs`; the game title itself is still to be chosen. Details: [docs/README.md](docs/README.md#legal--ip-note-read-first).

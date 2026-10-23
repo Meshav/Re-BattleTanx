@@ -11,6 +11,12 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); f
 .hud-score { right: 16px; top: 16px; text-align: right; }
 .hud-help { left: 16px; top: 16px; opacity: .8; font-size: 12px; }
 .hud-center { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); font-size: 22px; color: var(--accent); text-align: center; }
+.hud-countdown { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); text-align: center; text-shadow: 0 2px 8px #000; }
+.cd-title { font-size: 20px; letter-spacing: .2em; text-transform: uppercase; }
+.cd-digit { font-size: 96px; font-weight: bold; line-height: 1.1; color: var(--accent); }
+.cd-digit.pop { animation: cdpop .6s ease-out; }
+.split .cd-digit { font-size: 56px; }
+@keyframes cdpop { from { transform: scale(1.8); opacity: 0; } 40% { opacity: 1; } to { transform: scale(1); } }
 .hidden { display: none !important; }
 .muted { opacity: .6; }
 .bar.shield { height: 4px; }

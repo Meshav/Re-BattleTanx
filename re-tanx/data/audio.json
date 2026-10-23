@@ -5,6 +5,8 @@
   "building_collapse": {"volume": 0.9, "pitchJitter": 0.06, "voices": 3},
   "building_crumble": {"volume": 0.6, "pitchJitter": 0.06, "voices": 3},
   "cloak": {"volume": 0.6, "pitchJitter": 0.06, "voices": 3},
+  "countdown_beep": {"volume": 0.5, "pitchJitter": 0, "voices": 2},
+  "countdown_go": {"volume": 0.6, "pitchJitter": 0, "voices": 2},
   "engine_loop": {"volume": 0.25, "pitchJitter": 0, "voices": 3},
   "explode_large": {"volume": 0.9, "pitchJitter": 0.06, "voices": 3},
   "explode_small": {"volume": 0.8, "pitchJitter": 0.06, "voices": 6},

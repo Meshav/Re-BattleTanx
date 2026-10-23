@@ -6,7 +6,7 @@ import { createWorld, type World } from "../world.ts";
 import { createCampaignState } from "./state.ts";
 import { deployCost } from "./deploy.ts";
 
-export interface MissionStart { mission: MissionDef; players: TankKind[]; bucks: number; difficulty: Difficulty; seed?: number }
+export interface MissionStart { mission: MissionDef; players: TankKind[]; bucks: number; difficulty: Difficulty; seed?: number; countdown?: boolean }
 
 /** Build a mission world: humans first (paying for their opening tanks), then wingmen following P1. */
 export function createMissionWorld(s: MissionStart): World {
@@ -14,7 +14,7 @@ export function createMissionWorld(s: MissionStart): World {
   const allies = s.mission.allies.map((kind) => ({ team: 0, kind, bot: "normal" as const, name: "Wingman" }));
   const cost = s.players.reduce((sum, k) => sum + deployCost(s, k), 0);
   const world = createWorld(parseMap(s.mission.map), [...humans, ...allies], {
-    seed: s.seed ?? 1, mode: { kind: "campaign" },
+    seed: s.seed ?? 1, mode: { kind: "campaign", ...(s.countdown ? { countdown: true } : {}) },
     campaign: createCampaignState(s.mission, s.bucks - cost, s.difficulty, s.bucks),
   });
   const leader = world.tanks[0];

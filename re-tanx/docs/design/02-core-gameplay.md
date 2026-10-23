@@ -87,6 +87,7 @@ As built ✅: the **Structures** tier — `#` buildings (300 HP) and `w` walls (
 - Objective tracker (QueenLord status, convoy progress, kills to win).
 - Kill feed ✅; status line (burn / stun / cloak / boost / repair) and a heat gauge for lasers ✅; boss health bar with phase ✅. ⏳ Hit markers, damage direction indicators.
 - Compact layout on small screens; one HUD per split-screen viewport. ✅
+- **Pre-match count-in** ✅ (Original): every local, campaign and online match opens with the arena or mission title, then 3-2-1 and GO! (3 s, nothing moves or scores, beeps per digit). Timing in `data/rules.json` `countdown`; original timeline in doc 15 §15.2.
 
 ## 2.9 Feel / juice checklist
 ✅ Screen shake scaled to distance (off with reduced motion), muzzle flash and tracers, chunky explosions, building crumble/collapse sounds, nuke flash. ⏳ Track marks, smoke at low HP, 40 ms hit-stop on kills. Snappy beats realistic.

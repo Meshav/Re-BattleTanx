@@ -4,12 +4,15 @@ import type { SimEvent } from "../events.ts";
 
 export type ModeKind = "deathmatch" | "annihilation" | "tankWars" | "family" | "battlelord" | "frenzy" | "holdEm" | "koth" | "horde" | "lastGang" | "siege" | "convoy" | "campaign";
 
-export interface ModeConfig { kind: ModeKind; scoreLimit?: number; timeLimit?: number }
+/** `countdown`: hold the world still for the pre-match count-in (data/rules.json `countdown`). */
+export interface ModeConfig { kind: ModeKind; scoreLimit?: number; timeLimit?: number; countdown?: boolean }
 
 /** Match bookkeeping. `winner` is a team, or -1 for a draw. */
 export interface ModeState {
   kind: ModeKind; scoreLimit: number; timeLimit: number; elapsed: number;
   scores: Record<number, number>; over: boolean; winner: number | undefined;
+  /** ticks of pre-match count-in left; 0 once it has run, absent when the match had none */
+  countdown?: number;
   /** Last Gang Standing: current round and the break before the next one */
   round?: number; nextRoundIn?: number;
   /** Siege: the defenders' core (kept here so snapshots carry it) */

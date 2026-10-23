@@ -1,5 +1,5 @@
 // Generates the placeholder sound set: original, procedurally synthesized, no third-party samples.
-// Run: node scripts/gen-audio.mjs   (needs ffmpeg for the music .mp3 files)
+// Run: node scripts/gen-audio.mjs   (needs ffmpeg for the music .mp3 files; add sound ids to rewrite only those)
 // Replace any file in packages/client/public/audio with a recorded one of the same name; data/audio.json sets levels.
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -126,6 +126,8 @@ const SFX = {
   queen_taken: () => { const b = buf(0.6); [660, 880].forEach((f, i) => osc(b, { at: i * 0.15, dur: 0.35, shape: "square", freq: () => f, amp: (t) => env(t, 0.005, 0.1) * 0.4, lp: 3000 })); return b; },
   queen_captured: () => { const b = buf(1); [523, 659, 784, 1047].forEach((f, i) => osc(b, { at: i * 0.1, dur: 0.5, shape: "square", freq: () => f, amp: (t) => env(t, 0.005, 0.15) * 0.35, lp: 3500 })); return b; },
   win: () => { const b = buf(2); [262, 330, 392, 523, 392, 523].forEach((f, i) => osc(b, { at: i * 0.14, dur: i === 5 ? 1.2 : 0.3, shape: "square", freq: () => f, amp: (t) => env(t, 0.005, i === 5 ? 0.5 : 0.1) * 0.35, lp: 3000 })); return b; },
+  countdown_beep: () => { const b = buf(0.3); osc(b, { dur: 0.3, shape: "square", freq: () => 784, amp: (t) => env(t, 0.003, 0.09) * 0.5, lp: 3500 }); osc(b, { dur: 0.3, freq: () => 1568, amp: (t) => env(t, 0.003, 0.06) * 0.3 }); return b; },
+  countdown_go: () => { const b = buf(0.8); osc(b, { dur: 0.8, shape: "square", freq: () => 1568, amp: (t) => env(t, 0.003, 0.3) * 0.5, lp: 4000 }); osc(b, { dur: 0.8, shape: "saw", freq: () => 784, amp: (t) => env(t, 0.003, 0.25) * 0.3, lp: 2500 }); return b; },
   lose: () => { const b = buf(2); [392, 370, 349, 330].forEach((f, i) => osc(b, { at: i * 0.3, dur: i === 3 ? 1.2 : 0.35, shape: "saw", freq: (t) => f * (i === 3 ? 1 - t * 0.1 : 1), amp: (t) => env(t, 0.01, i === 3 ? 0.5 : 0.15) * 0.4, lp: 1500 })); return b; },
   // UI
   ui_click: () => { const b = buf(0.06); osc(b, { dur: 0.06, shape: "square", freq: () => 1800, amp: (t) => env(t, 0.001, 0.012) * 0.5, lp: 5000 }); return b; },
@@ -182,18 +184,22 @@ const MUSIC = {
 };
 
 // ---------- write ----------
-rmSync(OUT, { recursive: true, force: true });
+// `node scripts/gen-audio.mjs id …` rewrites only those sfx: no wipe, no music, no ffmpeg
+const only = process.argv.slice(2);
+const unknown = only.filter((id) => !SFX[id]);
+if (unknown.length) throw new Error(`unknown sfx: ${unknown.join(", ")}`);
+if (!only.length) rmSync(OUT, { recursive: true, force: true });
 mkdirSync(join(OUT, "sfx"), { recursive: true });
 mkdirSync(join(OUT, "music"), { recursive: true });
-for (const [id, make] of Object.entries(SFX)) {
+for (const [id, make] of Object.entries(SFX).filter(([id]) => !only.length || only.includes(id))) {
   seed = 12345 + id.length * 977; // stable output per sound
   writeFileSync(join(OUT, "sfx", `${id}.wav`), wav(id === "engine_loop" ? make() : normalize(make())));
 }
-for (const [id, make] of Object.entries(MUSIC)) {
+for (const [id, make] of only.length ? [] : Object.entries(MUSIC)) {
   seed = 777;
   const tmp = join(OUT, "music", `${id}.wav`);
   writeFileSync(tmp, wav(make()));
   execFileSync("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", "-i", tmp, "-c:a", "libmp3lame", "-b:a", "96k", join(OUT, "music", `${id}.mp3`)]);
   rmSync(tmp);
 }
-console.log(`wrote ${Object.keys(SFX).length} sfx and ${Object.keys(MUSIC).length} music loops to ${OUT}`);
+console.log(only.length ? `wrote ${only.join(", ")} to ${OUT}/sfx` : `wrote ${Object.keys(SFX).length} sfx and ${Object.keys(MUSIC).length} music loops to ${OUT}`);

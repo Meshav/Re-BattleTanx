@@ -20,6 +20,8 @@ export type SimEvent =
   | { type: "strikeWarn"; pos: Vec2; radius: number }
   | { type: "wave"; wave: number; count: number }
   | { type: "round"; round: number; winner: number }
+  /** pre-match count-in: beats left (0 = go) */
+  | { type: "countdown"; left: number }
   | { type: "convoy"; what: "delivered"; tankId: number; team: number }
   | { type: "rail"; what: "mount" | "dismount"; tankId: number }
   | { type: "queen"; what: "taken" | "dropped" | "returned" | "captured"; queenId: number; team: number; pos: Vec2 };

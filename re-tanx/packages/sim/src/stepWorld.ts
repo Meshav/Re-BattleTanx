@@ -16,11 +16,13 @@ import { stepStatus } from "./systems/stepStatus.ts";
 import { stepTurrets } from "./systems/stepTurrets.ts";
 import { stepStats } from "./progression/stats.ts";
 import { recordHistory } from "./systems/lagComp.ts";
+import { stepCountdown } from "./systems/stepCountdown.ts";
 
 /** The only place that orders systems. One call = one fixed tick. */
 export function stepWorld(world: World): SimEvent[] {
   if (world.mode.over) return [];
   world.tick++;
+  if (world.mode.countdown) return stepCountdown(world);
   stepBots(world);
   stepMovement(world);
   recordHistory(world);

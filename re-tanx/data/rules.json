@@ -1,6 +1,11 @@
 {
   "tickRate": 30,
   "respawnDelay": 3,
+  "countdown": {
+    "beatTicks": 18,
+    "beats": 5,
+    "digits": 3
+  },
   "rammingMinSpeed": 6,
   "rammingFactor": 2,
   "selfSplashFactor": 0.5,

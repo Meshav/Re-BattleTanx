@@ -24,7 +24,7 @@ import { modeRules } from "../modes/registry.ts";
 type Packed = [number, number, number, number, number, number, number] | [number, number, number, number, number, number, number, number];
 
 /** A campaign mission is rebuilt from its id and the opening purchase instead of slots. */
-export interface MissionSetup { id: string; players: TankKind[]; bucks: number; difficulty: Difficulty; seed: number }
+export interface MissionSetup { id: string; players: TankKind[]; bucks: number; difficulty: Difficulty; seed: number; countdown?: boolean }
 
 /** [tick, human index, what]: a tank kind = campaign redeploy, "bot" = that player left and a bot took the tank, "human" = they rejoined. */
 export type ReplayAction = [number, number, string];

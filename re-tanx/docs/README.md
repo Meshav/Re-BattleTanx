@@ -17,7 +17,7 @@ Docs keep their original numbers (01–14) so "doc 09 §9.4" style references ke
 
 | Folder | For | Contents |
 |--------|-----|----------|
-| [`design/`](design/) | Game design: what the game is and how it should feel | 01–08 |
+| [`design/`](design/) | Game design: what the game is and how it should feel | 01–08, 15 |
 | [`engineering/`](engineering/) | How it's built: netcode, data, module maps, code rules | 09, 12 |
 | [`planning/`](planning/) | Where it stands: roadmap, phased plan, status | 10, 11, 13 |
 | [`guides/`](guides/) | How-tos for people doing a job: making maps, self-hosting | 14, self-hosting, map templates |
@@ -35,6 +35,7 @@ Every doc marks what's built against the repo (✅ built and tested · ⏳ plann
 | 06 | [ai-behavior.md](design/06-ai-behavior.md) | Bot AI: architecture, archetypes, mode roles, difficulty — with build status |
 | 07 | [progression-leveling.md](design/07-progression-leveling.md) | XP, levels, unlocks, perks, challenges, ranked rating, PvP fairness |
 | 08 | [levels-and-maps.md](design/08-levels-and-maps.md) | Map design rules, map format as built, arenas, map editor |
+| 15 | [decomp-findings.md](design/15-decomp-findings.md) | What the N64 decompilation says: countdown, unit/weapon/pickup numbers, destructibles, levels, gaps in Re-Tanx |
 
 ### Engineering
 | # | File | Covers |

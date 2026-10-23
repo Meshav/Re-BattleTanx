@@ -11,6 +11,7 @@ import { lastGang } from "./lastGang.ts";
 import { siege } from "./siege.ts";
 import { convoy } from "./convoy.ts";
 import { modeDefs } from "../data/modeDefs.ts";
+import { rules } from "../data/rules.ts";
 
 export const modeRules: Record<ModeKind, ModeRules> = { deathmatch, annihilation, tankWars, family, battlelord, frenzy, holdEm, koth, horde, lastGang, siege, convoy, campaign };
 /** Modes you can pick for a versus match (campaign is started from the campaign screen). */
@@ -21,5 +22,6 @@ export function createModeState(cfg: ModeConfig): ModeState {
   return {
     kind: cfg.kind, scoreLimit: cfg.scoreLimit ?? d.scoreLimit, timeLimit: cfg.timeLimit ?? d.timeLimit,
     elapsed: 0, scores: {}, over: false, winner: undefined,
+    ...(cfg.countdown ? { countdown: rules.countdown.beats * rules.countdown.beatTicks } : {}),
   };
 }

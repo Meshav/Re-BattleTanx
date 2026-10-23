@@ -49,7 +49,7 @@ function chooseTanks(ctx: Ctx, i: number, picked: TankKind[]): void {
 
 function play(ctx: Ctx, i: number, tanks: TankKind[]): void {
   const p = loadProgress();
-  const setup = { id: missions[i]!.id, players: tanks, bucks: p.bucks, difficulty: p.difficulty, seed: (Date.now() & 0xffff) || 1 };
+  const setup = { id: missions[i]!.id, players: tanks, bucks: p.bucks, difficulty: p.difficulty, seed: (Date.now() & 0xffff) || 1, countdown: true };
   const world = createMissionWorld({ ...setup, mission: missions[i]! });
   const recorder = createRecorder({ map: "", slots: [], opts: {}, mission: setup }, tanks.length);
   ctx.host.innerHTML = "";
