@@ -8,6 +8,7 @@ import { gangDefs } from "../data/gangDefs.ts";
 import { randomSpecials, specialDefs } from "../data/specialDefs.ts";
 import { pick, shuffled } from "../math/rng.ts";
 import { perkMods, type PerkId } from "../progression/perks.ts";
+import { oracleDefs, type OracleId } from "../progression/oracles.ts";
 
 export interface Tank {
   id: number; team: number; kind: TankKind; name: string;
@@ -33,7 +34,15 @@ export interface Tank {
   /** hover strafe velocity component */
   slide: number;
   perks: PerkId[];
+  /** loadout brought from a profile (undefined / empty = upgrades off: Arcade, bots, guests) — see TankSlot */
+  pros?: PerkId[] | undefined;
+  weaponXp?: Partial<Record<SpecialKind, number>> | undefined;
+  /** kills per tank kind (profile + this match): rank upgrades for the tank being driven */
+  mastery?: Partial<Record<TankKind, number>> | undefined;
+  oracle?: OracleLink | undefined;
 }
+
+export interface OracleLink { id: OracleId; bond: number }
 
 export interface TankFx { burn: number; burnDps: number; burnBy: number; stun: number; cloak: number; boost: number; repair: number }
 export const noFx = (): TankFx => ({ burn: 0, burnDps: 0, burnBy: 0, stun: 0, cloak: 0, boost: 0, repair: 0 });
@@ -46,7 +55,8 @@ export function newTank(world: World, slot: TankSlot, spawn: Vec2): Tank {
     pos: { ...spawn }, rot: 0, turretRot: 0, speed: 0, hp: 0, cooldown: 0,
     alive: true, respawnIn: 0, kills: 0, deaths: 0,
     gang, roster, rosterIndex: -1, specials: {}, selected: undefined, specialCooldown: 0,
-    shield: 0, shieldTime: 0, signatureSpent: false, fx: noFx(), heat: 0, overheated: 0, stillFor: 0, slide: 0, perks: slot.perks ?? [],
+    shield: 0, shieldTime: 0, signatureSpent: false, fx: noFx(), heat: 0, overheated: 0, stillFor: 0, slide: 0, perks: slot.perks ?? [], pros: slot.pros, weaponXp: slot.weaponXp,
+    mastery: slot.mastery && { ...slot.mastery }, oracle: slot.oracle,
   };
   startLife(world, tank);
   return tank;
@@ -68,6 +78,13 @@ export function startLife(world: World, tank: Tank): void {
   tank.specials = {};
   tank.selected = undefined;
   giveSignature(world, tank);
+  giveGift(tank);
+}
+
+/** A close enough bond with your Oracle starts every life with her gift. */
+function giveGift(tank: Tank): void {
+  const gift = tank.oracle && oracleDefs[tank.oracle.id].gift;
+  if (gift && tank.oracle!.bond >= gift.bond) addSpecial(tank, gift.special as SpecialKind, gift.amount);
 }
 
 function giveSignature(world: World, tank: Tank): void {

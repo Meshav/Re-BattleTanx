@@ -30,16 +30,21 @@
     ],
     "3": [
       "gang:rustSaints",
-      "perkSlot"
+      "perkSlot",
+      "perk:scavenger",
+      "perk:treads"
     ],
     "5": [
       "tank:hover",
-      "gang:faultline"
+      "gang:faultline",
+      "perk:quickLoader",
+      "perk:fieldMedic"
     ],
     "8": [
       "gang:echoCompany",
       "tank:sentinel",
-      "tank:rattler"
+      "tank:rattler",
+      "perk:ghostEngine"
     ],
     "10": [
       "perkSlot",
@@ -48,13 +53,16 @@
     ],
     "12": [
       "gang:blackHalos",
-      "tank:flpe"
+      "tank:flpe",
+      "perk:demolitionist"
     ],
     "15": [
-      "gang:madBattalion"
+      "gang:madBattalion",
+      "perk:lastStand"
     ],
     "18": [
-      "tank:rhino"
+      "tank:rhino",
+      "perk:queensChampion"
     ],
     "20": [
       "gang:gearFiends",
@@ -87,6 +95,18 @@
     180,
     225
   ],
+  "weaponLevels": [
+    0,
+    8,
+    25,
+    50,
+    90
+  ],
+  "weaponXp": {
+    "use": 1,
+    "kill": 3
+  },
+  "weaponPowerPerLevel": 0.05,
   "challenges": {
     "perDay": 3,
     "pool": [
@@ -156,6 +176,15 @@
       "mods": {
         "starBonus": 1,
         "maxHp": 0.9
+      },
+      "pro": {
+        "label": "Grab 40 crates",
+        "stat": "pickups",
+        "target": 40,
+        "up": "Health crates heal +20%",
+        "mods": {
+          "healthPickup": 1.2
+        }
       }
     },
     "treads": {
@@ -165,6 +194,15 @@
       "mods": {
         "ram": 1.2,
         "speed": 0.95
+      },
+      "pro": {
+        "label": "Destroy 30 tanks",
+        "stat": "kills",
+        "target": 30,
+        "up": "+10% armor",
+        "mods": {
+          "armor": 1.1
+        }
       }
     },
     "quickLoader": {
@@ -174,6 +212,15 @@
       "mods": {
         "fireRate": 1.12,
         "specialMax": 0.85
+      },
+      "pro": {
+        "label": "Destroy 50 tanks",
+        "stat": "kills",
+        "target": 50,
+        "up": "No special capacity penalty",
+        "mods": {
+          "specialMax": 1.18
+        }
       }
     },
     "fieldMedic": {
@@ -183,6 +230,15 @@
       "mods": {
         "healthPickup": 1.3,
         "shieldPickup": 0.7
+      },
+      "pro": {
+        "label": "Grab 30 crates",
+        "stat": "pickups",
+        "target": 30,
+        "up": "No shield penalty",
+        "mods": {
+          "shieldPickup": 1.43
+        }
       }
     },
     "ghostEngine": {
@@ -192,6 +248,15 @@
       "mods": {
         "hearing": 0.5,
         "armor": 0.9
+      },
+      "pro": {
+        "label": "Destroy 25 tanks",
+        "stat": "kills",
+        "target": 25,
+        "up": "+5% speed",
+        "mods": {
+          "speed": 1.05
+        }
       }
     },
     "demolitionist": {
@@ -201,6 +266,15 @@
       "mods": {
         "structureDmg": 1.5,
         "tankDmg": 0.9
+      },
+      "pro": {
+        "label": "Flatten 60 structures",
+        "stat": "structures",
+        "target": 60,
+        "up": "No tank damage penalty",
+        "mods": {
+          "tankDmg": 1.11
+        }
       }
     },
     "lastStand": {
@@ -210,6 +284,15 @@
       "mods": {
         "lowHpDmg": 1.25,
         "damageTaken": 1.1
+      },
+      "pro": {
+        "label": "Destroy 30 tanks",
+        "stat": "kills",
+        "target": 30,
+        "up": "Low-HP bonus rises to +40%",
+        "mods": {
+          "lowHpDmg": 1.12
+        }
       }
     },
     "queensChampion": {
@@ -219,6 +302,160 @@
       "mods": {
         "carrySpeed": 1.1,
         "maxHp": 0.95
+      },
+      "pro": {
+        "label": "Capture 5 Oracles",
+        "stat": "queens",
+        "target": 5,
+        "up": "+10% more carry speed",
+        "mods": {
+          "carrySpeed": 1.1
+        }
+      }
+    }
+  },
+  "tankUpgrades": [
+    {
+      "rank": 3,
+      "name": "Reinforced plating",
+      "up": "+5% max HP",
+      "mods": {
+        "maxHp": 1.05
+      }
+    },
+    {
+      "rank": 5,
+      "name": "Tuned engine",
+      "up": "+4% speed",
+      "mods": {
+        "speed": 1.04
+      }
+    },
+    {
+      "rank": 7,
+      "name": "Fast autoloader",
+      "up": "+6% fire rate",
+      "mods": {
+        "fireRate": 1.06
+      }
+    },
+    {
+      "rank": 10,
+      "name": "Veteran crew",
+      "up": "−6% damage taken",
+      "mods": {
+        "damageTaken": 0.94
+      }
+    }
+  ],
+  "bond": {
+    "track": [
+      0,
+      30,
+      80,
+      150,
+      250
+    ],
+    "xp": {
+      "match": 10,
+      "win": 10,
+      "kill": 1
+    }
+  },
+  "oracles": {
+    "vesper": {
+      "name": "Vesper",
+      "title": "the Warden",
+      "up": "+12% max HP, −6% damage taken",
+      "mods": {
+        "maxHp": 1.12,
+        "damageTaken": 0.94
+      },
+      "gift": {
+        "bond": 3,
+        "special": "health",
+        "amount": 1
+      },
+      "unlock": {
+        "stat": "missions",
+        "target": 1,
+        "label": "Complete a campaign mission"
+      }
+    },
+    "ione": {
+      "name": "Ione",
+      "title": "the Swift",
+      "up": "+8% speed, +15% carry speed",
+      "mods": {
+        "speed": 1.08,
+        "carrySpeed": 1.15
+      },
+      "gift": {
+        "bond": 3,
+        "special": "speed",
+        "amount": 1
+      },
+      "unlock": {
+        "stat": "missions",
+        "target": 3,
+        "label": "Complete 3 campaign missions"
+      }
+    },
+    "marrow": {
+      "name": "Marrow",
+      "title": "the Breaker",
+      "up": "+30% structure damage, +20% ram damage",
+      "mods": {
+        "structureDmg": 1.3,
+        "ram": 1.2
+      },
+      "gift": {
+        "bond": 3,
+        "special": "mine",
+        "amount": 2
+      },
+      "unlock": {
+        "stat": "structures",
+        "target": 100,
+        "label": "Flatten 100 structures"
+      }
+    },
+    "sable": {
+      "name": "Sable",
+      "title": "the Hunter",
+      "up": "+8% damage to tanks, bots hear you at 70% range",
+      "mods": {
+        "tankDmg": 1.08,
+        "hearing": 0.7
+      },
+      "gift": {
+        "bond": 3,
+        "special": "guided",
+        "amount": 1
+      },
+      "unlock": {
+        "stat": "kills",
+        "target": 150,
+        "label": "Destroy 150 tanks"
+      }
+    },
+    "lumen": {
+      "name": "Lumen",
+      "title": "the Keeper",
+      "up": "+25% special capacity, +8% fire rate",
+      "mods": {
+        "specialMax": 1.25,
+        "fireRate": 1.08
+      },
+      "gift": {
+        "bond": 3,
+        "special": "repair",
+        "amount": 1
+      },
+      "unlock": {
+        "stat": "missions",
+        "target": 6,
+        "label": "Complete 6 campaign missions"
       }
     }
   }

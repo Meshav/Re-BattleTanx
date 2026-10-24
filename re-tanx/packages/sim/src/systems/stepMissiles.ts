@@ -24,7 +24,7 @@ export function stepMissiles(world: World): SimEvent[] {
     if (!hitTank && !wall && m.fuel > 0) return true;
     events.push(...applySplash(world, {
       pos: m.pos, radius: m.splash, damage: m.damage, sourceId: m.ownerId,
-      direct: hitTank, directStructure: wall ? structureAt(world, cx, cy) : undefined,
+      direct: hitTank, directStructure: wall ? structureAt(world, cx, cy) : undefined, weapon: m.kind === "rocket" ? undefined : m.kind,
     }));
     return false;
   });

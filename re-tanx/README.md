@@ -9,7 +9,7 @@ A browser fan port inspired by BattleTanx (N64). Arcade tank combat in destructi
 npm install
 npm run dev        # client, http://localhost:5173 (proxies /ws, /auth, /leaderboard, /history to :8787)
 npm run server     # game server for online play, :8787
-npm run check      # rules + IP-name guard + typecheck + tests (265)
+npm run check      # rules + IP-name guard + typecheck + tests (268)
 npm run build      # static client in packages/client/dist
 docker compose up --build  # web on :24873 (client + proxy) + game server + MariaDB
 ```

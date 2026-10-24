@@ -1,14 +1,14 @@
 import { playMusic } from "../../audio/sfx.ts";
-import { campaignMissions, createMissionWorld, createRecorder, deployCost, deployTank, finalScore, levelFor, type Recorder, type Replay, type TankKind, type World } from "@re-tanx/sim";
+import { campaignMissions, createMissionWorld, createRecorder, deployCost, deployTank, finalScore, levelFor, loadoutOf, wingmenOracles, type MissionSetup, type Recorder, type Replay, type TankKind, type World } from "@re-tanx/sim";
 import { downloadReplay, saveReplay, watchReplay } from "../replays.ts";
 import { runLocalWorld, type RunCtx } from "../localMatch.ts";
 import type { LocalPlayer } from "../localPlayer.ts";
 import type { Device } from "../matchConfig.ts";
 import { showCampaignMenu } from "./campaignMenu.ts";
 import { showBriefing } from "./briefing.ts";
-import { renderDeploy } from "./deployScreen.ts";
+import { redeployPrompt, renderDeploy } from "./deployScreen.ts";
 import { showDebrief } from "./debrief.ts";
-import { betterGrade, freshProgress, loadProgress, saveProgress, type Progress } from "./progress.ts";
+import { freshProgress, loadProgress, recordWin, saveProgress } from "./progress.ts";
 import { awardLocal, loadProfile } from "../profile/localProfile.ts";
 
 const missions = campaignMissions;
@@ -49,49 +49,30 @@ function chooseTanks(ctx: Ctx, i: number, picked: TankKind[]): void {
 
 function play(ctx: Ctx, i: number, tanks: TankKind[]): void {
   const p = loadProgress();
-  const setup = { id: missions[i]!.id, players: tanks, bucks: p.bucks, difficulty: p.difficulty, seed: (Date.now() & 0xffff) || 1, countdown: true };
+  const setup = { id: missions[i]!.id, players: tanks, bucks: p.bucks, difficulty: p.difficulty, seed: (Date.now() & 0xffff) || 1, countdown: true, ...p1Loadouts() };
   const world = createMissionWorld({ ...setup, mission: missions[i]! });
   const recorder = createRecorder({ map: "", slots: [], opts: {}, mission: setup }, tanks.length);
   ctx.host.innerHTML = "";
   const deploys = new Map<number, () => void>();
   runLocalWorld(world, DEVICES.slice(0, tanks.length), ctx, {
-    onPlayerFrame: (lp, w) => redeploy(lp, w, deploys, recorder),
+    onPlayerFrame: (lp, w) => redeployPrompt(lp, w, deploys, (k) => {
+      if (deployTank(w, lp.tank.id, k)) recorder.action(w, w.tanks.indexOf(lp.tank), k);
+    }),
     onOver: (w) => finish(ctx, i, w, recorder.finish(w)),
     onQuit: () => startCampaign(ctx),
   }, { recorder });
 }
 
-/** Mid-mission: a dead player gets the deploy screen in their viewport (auto-picks after 8 s). */
-function redeploy(lp: LocalPlayer, w: World, open: Map<number, () => void>, rec: Recorder): void {
-  const c = w.campaign!;
-  const id = lp.tank.id;
-  const wrap = lp.hudRoot.querySelector<HTMLElement>(".deploy-wrap");
-  const needs = !lp.tank.alive && c.pendingDeploy[id] === undefined && c.outcome === "playing" && lp.tank.respawnIn <= 0.5;
-  if (!needs) {
-    if (wrap) wrap.remove();
-    open.get(id)?.();
-    open.delete(id);
-    return;
-  }
-  if (wrap) return;
-  const el = document.createElement("div");
-  el.className = "deploy-wrap";
-  lp.hudRoot.appendChild(el);
-  open.set(id, renderDeploy(el, { title: "Redeploy", bucks: c.bucks, cost: (k) => deployCost(c, k), autoSeconds: 8, preferred: lp.tank.kind, level: levelFor(loadProfile().xp).level }, (k) => {
-    if (deployTank(w, id, k)) rec.action(w, w.tanks.indexOf(lp.tank), k);
-  }));
+/** Split-screen shares one profile: P1 brings their loadout, and their Oracles ride with the wingmen. */
+function p1Loadouts(): Pick<MissionSetup, "loadouts" | "allyOracles"> {
+  const prof = loadProfile();
+  return { loadouts: [loadoutOf(prof)], allyOracles: wingmenOracles(prof, prof.wingmen, prof.oracle) };
 }
 
 function finish(ctx: Ctx, i: number, w: World, replay: Replay): void {
   saveReplay(replay);
   const c = w.campaign!;
-  const p: Progress = loadProgress();
-  if (c.outcome === "won") {
-    p.bucks = c.bucks;
-    p.unlocked = Math.max(p.unlocked, Math.min(i + 1, missions.length - 1));
-    p.grades[c.mission.id] = betterGrade(p.grades[c.mission.id], finalScore(w).grade);
-    saveProgress(p);
-  }
+  if (c.outcome === "won") recordWin(c.mission.id, finalScore(w).grade, c.bucks);
   const hasNext = c.outcome === "won" && i + 1 < missions.length;
   const xp = awardLocal(w, c.outcome === "won" ? finalScore(w).grade : undefined);
   showDebrief(ctx.host, w, {

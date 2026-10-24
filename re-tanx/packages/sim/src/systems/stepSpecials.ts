@@ -53,16 +53,16 @@ const uses: Record<SpecialKind, Use> = {
   swarm: (w, t, s) => fireSwarm(w, t, s),
   mine: (w, t, s, n) => dropMine(w, t, s, n),
   nuke: (w, t) => plantNuke(w, t),
-  health: (_w, t) => useHealthKit(t),
+  health: (w, t) => useHealthKit(w, t),
   laser: (w, t, s) => fireLaserBlast(w, t, s),
   plasma: (w, t, s) => firePlasma(w, t, s),
   turret: (w, t) => placeSentry(w, t),
   shock: (w, t) => shockwave(w, t, "shock"),
   edge: (w, t) => shockwave(w, t, "edge"),
-  cloak: (_w, t) => cloak(t),
-  speed: (_w, t) => boost(t),
+  cloak: (w, t) => cloak(w, t),
+  speed: (w, t) => boost(w, t),
   teleport: (w, t) => teleport(w, t),
-  repair: (_w, t) => repair(t),
+  repair: (w, t) => repair(w, t),
 };
 
 const fire = (world: World, tank: Tank, kind: SpecialKind, isSuper: boolean, have: number): SimEvent[] => uses[kind](world, tank, isSuper, have);

@@ -23,14 +23,14 @@ function beam(world: World, tank: Tank, isSuper: boolean): SimEvent[] {
     { type: "special", tankId: tank.id, kind: "laser", super: isSuper, pos: { ...tank.pos } },
     { type: "fire", tankId: tank.id, pos: { ...hit.pos }, rot: tank.turretRot, weapon: "laser" },
   ];
-  if (!isSuper) return [...events, ...damageAt(world, hit, damage, tank.id, tank.pos)];
+  if (!isSuper) return [...events, ...damageAt(world, hit, damage, tank.id, tank.pos, "laser")];
   const wall = dist(hit.pos, tank.pos);
   const dir = fromAngle(tank.turretRot);
   for (const t of world.tanks) {
     if (!t.alive || t.team === tank.team) continue;
     const along = (t.pos.x - tank.pos.x) * dir.x + (t.pos.y - tank.pos.y) * dir.y;
     const off = dist(t.pos, add(tank.pos, scale(dir, along)));
-    if (along > 0 && along < wall && off <= tankDefs[t.kind].radius) events.push(...applyDamage(world, { target: t, amount: damage, sourceId: tank.id, from: tank.pos }));
+    if (along > 0 && along < wall && off <= tankDefs[t.kind].radius) events.push(...applyDamage(world, { target: t, amount: damage, sourceId: tank.id, from: tank.pos, weapon: "laser" }));
   }
   return events;
 }

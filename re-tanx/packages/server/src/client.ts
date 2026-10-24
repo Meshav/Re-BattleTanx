@@ -1,5 +1,5 @@
 import type { WebSocket } from "ws";
-import type { GangId, PerkId, Profile, ServerMsg } from "@re-tanx/sim";
+import type { GangId, PerkId, Profile, ServerMsg, TankKind } from "@re-tanx/sim";
 
 /** One connected browser. */
 export interface Client {
@@ -13,6 +13,11 @@ export interface Client {
   profileId: string | undefined;
   profile: Profile | undefined;
   perks: PerkId[];
+  /** Oracle asked for in hello, already checked against the server profile; wingmen: Oracles wished for AI wingmen (checked at match start) */
+  oracle?: string | undefined;
+  wingmen?: string[] | undefined;
+  /** campaign co-op opening tank picked in the lobby */
+  tank?: TankKind | undefined;
   /** resolves once hello has identified this player (rejoin needs the profile id) */
   ready?: Promise<void>;
 }

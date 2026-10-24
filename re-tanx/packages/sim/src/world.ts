@@ -5,7 +5,7 @@ import type { GameMap } from "./data/map.ts";
 import { rules } from "./data/rules.ts";
 import type { TankKind } from "./data/tankDefs.ts";
 import type { GangId } from "./data/gangDefs.ts";
-import { newTank, type Tank } from "./entities/tank.ts";
+import { newTank, type OracleLink, type Tank } from "./entities/tank.ts";
 import type { Projectile } from "./entities/projectile.ts";
 import type { Structure } from "./entities/structure.ts";
 import type { Missile } from "./entities/missile.ts";
@@ -23,6 +23,7 @@ import type { Difficulty } from "./data/aiDefs.ts";
 import type { Queen } from "./entities/queen.ts";
 import type { CampaignState } from "./campaign/state.ts";
 import type { PerkId } from "./progression/perks.ts";
+import type { SpecialKind } from "./data/specialDefs.ts";
 import type { MatchStats } from "./progression/stats.ts";
 import type { Zone } from "./modes/koth.ts";
 import type { HordeState } from "./modes/horde.ts";
@@ -66,11 +67,14 @@ export interface World {
   strikes: Strike[];
 }
 
-/** `perks: false` strips loadouts (Classic / ranked lobbies). */
+/** `perks: false` is Arcade: strips loadout perks and weapon upgrades (ranked and quick-match lobbies, or by choice). */
 export interface WorldOptions { seed?: number; mode?: ModeConfig; campaign?: CampaignState; perks?: boolean }
 
 /** A player slot: a gang (rotating roster + signature) or a single fixed tank kind; `bot` makes it AI-driven. */
-export interface TankSlot { team: number; kind?: TankKind; gang?: GangId; bot?: Difficulty; name?: string; perks?: PerkId[] }
+export interface TankSlot { team: number; kind?: TankKind; gang?: GangId; bot?: Difficulty; name?: string; perks?: PerkId[];
+  /** loadout from a profile (see progression/loadout.ts); Arcade strips it */
+  pros?: PerkId[]; weaponXp?: Partial<Record<SpecialKind, number>>; mastery?: Partial<Record<TankKind, number>>; oracle?: OracleLink;
+}
 
 export function createWorld(map: GameMap, slots: TankSlot[], opts: WorldOptions = {}): World {
   const world: World = {
@@ -90,7 +94,7 @@ export function createWorld(map: GameMap, slots: TankSlot[], opts: WorldOptions 
   const mode = modeRules[world.mode.kind];
   const teams = mode.teamCount ?? (mode.usesFortresses ? Math.max(2, map.fortresses.length) : Infinity);
   const fixedTeams = slots.every((s) => s.team < teams);
-  const withPerks = (s: TankSlot): TankSlot => (opts.perks === false ? { ...s, perks: [] } : s);
+  const withPerks = (s: TankSlot): TankSlot => (opts.perks === false ? { ...s, perks: [], pros: undefined, weaponXp: undefined, mastery: undefined, oracle: undefined } : s);
   const teamFor = (s: TankSlot, i: number) => mode.allTeam ?? (fixedTeams ? s.team : i % teams);
   slots.forEach((slot, i) => addTank(world, withPerks({ ...slot, team: teamFor(slot, i) }), i));
   if (mode.usesFortresses) for (const t of world.tanks) {

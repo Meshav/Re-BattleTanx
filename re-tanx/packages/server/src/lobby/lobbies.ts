@@ -1,5 +1,6 @@
 import type { LobbySettings } from "@re-tanx/sim";
-import { PROTOCOL_LIMITS, mapById } from "@re-tanx/sim";
+import { PROTOCOL_LIMITS, deployTank, mapById, missionById, type TankKind } from "@re-tanx/sim";
+import { tankOk } from "../match/campaignMatch.ts";
 import { send, type Client } from "../client.ts";
 import { newCode } from "./codes.ts";
 import { awaitingRejoin, createMatch, dropSeat, humansLeft, rejoinSeat, runMatch, sendStart, stopMatch, type Match } from "../match/match.ts";
@@ -21,7 +22,7 @@ export interface Lobbies { byCode: Map<string, Lobby>; svc: Services }
 export const createLobbies = (svc: Services): Lobbies => ({ byCode: new Map(), svc });
 
 function announce(l: Lobby): void {
-  const members = l.members.map((c) => ({ id: c.id, name: c.name, gang: c.gang, host: c.id === l.hostId }));
+  const members = l.members.map((c) => ({ id: c.id, name: c.name, gang: c.gang, host: c.id === l.hostId, ...(c.tank ? { tank: c.tank } : {}) }));
   const startsIn = l.startsAt ? Math.max(0, Math.ceil((l.startsAt - Date.now()) / 1000)) : undefined;
   for (const c of l.members) send(c, { t: "lobby", code: l.code, members, settings: l.settings, ...(startsIn !== undefined ? { startsIn } : {}) });
 }
@@ -62,6 +63,18 @@ export function refreshMember(ls: Lobbies, c: Client): void {
   if (l && !l.match) announce(l);
 }
 
+/** Campaign co-op: in the lobby, pick your opening tank; mid-mission, buy your next one from the shared wallet. */
+export function deployFor(ls: Lobbies, c: Client, kind: TankKind): void {
+  const l = c.lobby ? ls.byCode.get(c.lobby) : undefined;
+  if (!l || l.settings.mode !== "campaign" || !tankOk(c, kind)) return;
+  if (!l.match) {
+    c.tank = kind;
+    return announce(l);
+  }
+  const i = l.match.seats.findIndex((s) => s.client === c);
+  if (i >= 0 && deployTank(l.match.world, l.match.seats[i]!.tankId, kind)) l.match.recorder.action(l.match.world, i, kind);
+}
+
 export function startLobby(ls: Lobbies, c: Client): void {
   const l = c.lobby ? ls.byCode.get(c.lobby) : undefined;
   if (!l || l.hostId !== c.id || l.match) return;
@@ -72,8 +85,11 @@ export function startLobby(ls: Lobbies, c: Client): void {
 export function beginMatch(ls: Lobbies, l: Lobby): void {
   clearTimeout(l.startTimer);
   l.startsAt = undefined;
-  const map = l.settings.customMap ?? mapById(l.settings.map);
-  l.match = createMatch(map, l.settings, l.members);
+  const mission = l.settings.mode === "campaign" ? missionById(l.settings.mission ?? "") : undefined;
+  const map = mission?.map ?? l.settings.customMap ?? mapById(l.settings.map);
+  // host first: in campaign co-op the wingmen follow (and carry the Oracles of) player one
+  const members = [...l.members].sort((a, b) => Number(b.id === l.hostId) - Number(a.id === l.hostId));
+  l.match = createMatch(map, l.settings, members);
   runMatch(l.match, map.id, () => {
     l.match = undefined;
     for (const m of l.members) send(m, { t: "ended" });

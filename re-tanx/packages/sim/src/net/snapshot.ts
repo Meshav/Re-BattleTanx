@@ -8,12 +8,15 @@ import type { ModeState } from "../modes/mode.ts";
 import type { Vec2 } from "../math/vec2.ts";
 import type { Queen } from "../entities/queen.ts";
 import type { Turret } from "../entities/turret.ts";
+import type { CampaignState } from "../campaign/state.ts";
+import type { BossState, Strike } from "../campaign/boss.ts";
 import { noFx } from "../entities/tank.ts";
 
 /** Changes every tick. */
 export type TankHot = Pick<Tank, "id" | "kind" | "pos" | "rot" | "turretRot" | "speed" | "hp" | "alive" | "respawnIn" | "shield" | "kills" | "deaths" | "rosterIndex"> & { fx?: Partial<Tank["fx"]> };
 /** Rarely changes: sent in full snapshots only. */
-export type TankMeta = Pick<Tank, "id" | "team" | "name" | "gang" | "roster" | "perks">;
+/** Loadout rides along so the client predicts its own tank's speed with the same perks / rank / Oracle as the server. */
+export type TankMeta = Pick<Tank, "id" | "team" | "name" | "gang" | "roster" | "perks" | "pros" | "mastery" | "oracle">;
 /** Only the owner needs it. */
 export type TankPrivate = Pick<Tank, "id" | "specials" | "selected" | "heat" | "overheated">;
 
@@ -38,7 +41,13 @@ export interface Snapshot {
   stages?: string;
   mode: ModeState;
   bots: number[];
+  /** campaign co-op: objectives, shared wallet, pending redeploys, outcome (the mission def itself the client has by id) */
+  campaign?: Omit<CampaignState, "mission">;
+  bosses?: BossState[];
+  strikes?: Strike[];
 }
+
+const campaignHot = ({ mission: _mission, ...c }: CampaignState): Omit<CampaignState, "mission"> => c;
 
 export interface SnapshotFor { meId: number | undefined; full: boolean; stages: string | undefined; pickups: boolean }
 
@@ -66,7 +75,7 @@ export function makeSnapshot(world: World, o: SnapshotFor): Snapshot {
   return {
     tick: world.tick,
     tanks: world.tanks.map(hot),
-    ...(o.full ? { meta: world.tanks.map((t) => ({ id: t.id, team: t.team, name: t.name, gang: t.gang, roster: t.roster, perks: t.perks })) } : {}),
+    ...(o.full ? { meta: world.tanks.map((t) => ({ id: t.id, team: t.team, name: t.name, gang: t.gang, roster: t.roster, perks: t.perks, pros: t.pros, mastery: t.mastery, oracle: t.oracle })) } : {}),
     ...(me ? { me: { id: me.id, specials: me.specials, selected: me.selected, heat: Math.round(me.heat), overheated: r1(me.overheated) } } : {}),
     projectiles: world.projectiles.map((p) => ({ id: p.id, pos: rv(p.pos) })),
     missiles: world.missiles.map((m) => ({ id: m.id, ownerId: m.ownerId, team: m.team, kind: m.kind, pos: rv(m.pos), rot: r2(m.rot) })),
@@ -81,6 +90,9 @@ export function makeSnapshot(world: World, o: SnapshotFor): Snapshot {
     ...(o.stages !== undefined ? { stages: o.stages } : {}),
     mode: { ...world.mode, elapsed: r1(world.mode.elapsed) },
     bots: Object.keys(world.bots).map(Number),
+    ...(world.campaign ? { campaign: campaignHot(world.campaign) } : {}),
+    ...(world.bosses.length ? { bosses: world.bosses } : {}),
+    ...(world.strikes.length ? { strikes: world.strikes.map((s) => ({ ...s, pos: rv(s.pos), fuse: r1(s.fuse) })) } : {}),
   };
 }
 
@@ -114,5 +126,8 @@ export function applySnapshot(mirror: World, s: Snapshot): void {
   if (s.pickups) mirror.pickups = s.pickups.map((p) => ({ ...p, respawnIn: 0, fixed: true, random: false, life: Infinity }));
   if (s.stages) [...s.stages].forEach((ch, i) => { const st = mirror.structures[i]; if (st) st.stage = Number(ch); });
   mirror.mode = s.mode;
+  if (s.campaign && mirror.campaign) Object.assign(mirror.campaign, s.campaign);
+  mirror.bosses = s.bosses ?? [];
+  mirror.strikes = s.strikes ?? [];
   mirror.bots = Object.fromEntries(s.bots.map((id) => [id, mirror.bots[id] ?? ({} as World["bots"][number])]));
 }

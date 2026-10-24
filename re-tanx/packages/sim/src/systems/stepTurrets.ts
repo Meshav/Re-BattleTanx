@@ -25,7 +25,7 @@ export function stepTurrets(world: World): SimEvent[] {
     const muzzle = add(t.pos, scale(fromAngle(t.rot), TURRET_RADIUS + 0.5));
     const hit = raycast(world, muzzle, t.rot, def.range, t.ownerId);
     events.push({ type: "fire", tankId: t.ownerId, pos: { ...hit.pos }, rot: t.rot, weapon: "turret" });
-    events.push(...damageAt(world, hit, def.damage, t.ownerId, t.pos));
+    events.push(...damageAt(world, hit, def.damage, t.ownerId, t.pos, "turret"));
     return true;
   });
   return events;

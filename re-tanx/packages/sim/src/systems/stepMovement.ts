@@ -48,7 +48,10 @@ export function moveTank(world: World, tank: Tank, raw: InputState): void {
   tank.turretRot = turnToward(tank.turretRot, input.aim, deg(def.turretRate) * dt);
   const accel = (def.speed / def.accelTime) * dt;
   const want = targetSpeed(world, tank, input.throttle);
-  tank.speed += clamp(want - tank.speed, -accel * 2, accel);
+  // slowing down or reversing bites harder than speeding up, in either direction: tanks stop, they don't coast
+  const braking = want * tank.speed < 0 || Math.abs(want) < Math.abs(tank.speed);
+  const rate = braking ? accel * rules.brakeFactor : accel;
+  tank.speed += clamp(want - tank.speed, -rate, rate);
   tank.pos.x += Math.cos(tank.rot) * tank.speed * dt;
   tank.pos.y += Math.sin(tank.rot) * tank.speed * dt;
   if (def.hover) strafe(tank, input.strafe, accel, dt);

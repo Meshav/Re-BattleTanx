@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { makeWorld, run } from "../testing/makeWorld.ts";
-import { levelFor, perkSlots, unlocksUpTo, xpToNext, masteryLevel, isUnlocked } from "./levels.ts";
+import { levelFor, perkSlots, unlocksUpTo, xpToNext, masteryLevel, isUnlocked, tierFor, weaponLevel, weaponPower, progressionDefs } from "./levels.ts";
+import { weaponLevelIn } from "./stats.ts";
+import type { WorldOptions } from "../world.ts";
+import type { SpecialKind } from "../data/specialDefs.ts";
 import { matchXp } from "./xp.ts";
 import { advanceChallenges, dailyChallenges } from "./challenges.ts";
 import { perkMods } from "./perks.ts";
@@ -25,6 +28,13 @@ describe("levels", () => {
   it("mastery climbs with kills in that tank, 1 to 10", () => {
     expect(masteryLevel(0)).toBe(1);
     expect(masteryLevel(225)).toBe(10);
+  });
+
+  it("weapon levels V1–V5 from weapon XP; tierFor reports progress to the next tier", () => {
+    expect(weaponLevel(0)).toBe(1);
+    expect(weaponLevel(1e6)).toBe(5);
+    expect(tierFor([0, 10, 30], 15)).toEqual({ level: 2, into: 5, next: 20 });
+    expect(tierFor([0, 10, 30], 40)).toEqual({ level: 3, into: 10, next: 0 });
   });
 });
 
@@ -104,9 +114,11 @@ describe("profile", () => {
     const w = makeWorld(["S...S"], [{ team: 0, kind: "goliath" }, { team: 1, kind: "moto" }], { mode: { kind: "deathmatch", scoreLimit: 1 } });
     w.tanks[1]!.hp = 1;
     run(w, 40, { [w.tanks[0]!.id]: { fire: true } });
+    w.stats[w.tanks[0]!.id]!.weaponXp.guided = 3;
     const r1 = applyMatch(newProfile(), w, w.tanks[0]!.id, { botsOnly: false, day: "2026-10-21" });
     expect(r1.profile.totals).toMatchObject({ matches: 1, wins: 1, kills: 1 });
     expect(r1.profile.masteryKills.goliath).toBe(1);
+    expect(r1.profile.weaponXp.guided).toBe(3);
     expect(r1.award.lines.some((l) => l.label === "First win today")).toBe(true);
     const r2 = applyMatch(r1.profile, w, w.tanks[0]!.id, { botsOnly: false, day: "2026-10-21" });
     expect(r2.award.lines.some((l) => l.label === "First win today")).toBe(false);
@@ -121,5 +133,40 @@ describe("profile", () => {
   it("sanitizes junk instead of trusting it", () => {
     expect(sanitizeProfile({ xp: -5, perks: ["x"], totals: null }).xp).toBe(0);
     expect(sanitizeProfile("nope")).toEqual(newProfile());
+    expect(sanitizeProfile({ weaponXp: null }).weaponXp).toEqual({});
+  });
+});
+
+describe("weapon upgrades", () => {
+  const duel = (opts: WorldOptions = {}) => {
+    const w = makeWorld(["S...S"], [{ team: 0, kind: "m1", weaponXp: { laser: 1e6 } }, { team: 1, kind: "m1" }], opts);
+    return { w, me: w.tanks[0]!, foe: w.tanks[1]! };
+  };
+  const hurt = ({ w, me, foe }: ReturnType<typeof duel>, weapon?: SpecialKind) => {
+    const hp = foe.hp;
+    applyDamage(w, { target: foe, amount: 10, sourceId: me.id, from: me.pos, raw: true, weapon });
+    return hp - foe.hp;
+  };
+
+  it("a maxed special hits harder; the main gun, unlevelled specials and Arcade don't", () => {
+    const d = duel();
+    const base = hurt(d);
+    expect(hurt(d, "laser") / base).toBeCloseTo(weaponPower(5));
+    expect(hurt(d, "mine")).toBeCloseTo(base);
+    const arcade = duel({ perks: false });
+    expect(arcade.me.weaponXp).toBeUndefined();
+    expect(hurt(arcade, "laser")).toBeCloseTo(base);
+  });
+
+  it("a mine kill names the weapon, pays weapon XP, and the level climbs mid-match", () => {
+    const w = makeWorld(["S...S"], [{ team: 0, kind: "m1", weaponXp: {} }, { team: 1, kind: "m1" }]);
+    const [me, foe] = [w.tanks[0]!, w.tanks[1]!];
+    foe.hp = 1;
+    w.mines.push({ id: w.nextId++, ownerId: me.id, team: me.team, pos: { ...foe.pos }, armIn: 0 });
+    expect(run(w, 1)).toContainEqual({ type: "kill", victimId: foe.id, killerId: me.id, weapon: "mine" });
+    expect(w.stats[me.id]!.weaponXp.mine).toBe(progressionDefs.weaponXp.kill);
+    expect(weaponLevelIn(w, me, "mine")).toBe(1);
+    w.stats[me.id]!.weaponXp.mine = 1e6;
+    expect(weaponLevelIn(w, me, "mine")).toBe(5);
   });
 });

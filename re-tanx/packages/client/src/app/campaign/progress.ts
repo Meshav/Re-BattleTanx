@@ -1,4 +1,4 @@
-import { campaignDefs, difficulties, type Difficulty } from "@re-tanx/sim";
+import { campaignDefs, campaignMissions, difficulties, type Difficulty } from "@re-tanx/sim";
 
 export interface Progress { bucks: number; unlocked: number; grades: Record<string, string>; difficulty: Difficulty; players: 1 | 2 }
 
@@ -26,3 +26,13 @@ export function saveProgress(p: Progress): void {
 
 const RANK = ["C", "B", "A", "S"];
 export const betterGrade = (a: string | undefined, b: string): string => (a && RANK.indexOf(a) >= RANK.indexOf(b) ? a : b);
+
+/** A won mission unlocks the next and keeps the better grade. `bucks`: the wallet carries over (local play; online co-op uses the server's). */
+export function recordWin(missionId: string, grade: string, bucks?: number): void {
+  const p = loadProgress();
+  const i = campaignMissions.findIndex((m) => m.id === missionId);
+  if (bucks !== undefined) p.bucks = bucks;
+  p.unlocked = Math.max(p.unlocked, Math.min(i + 1, campaignMissions.length - 1));
+  p.grades[missionId] = betterGrade(p.grades[missionId], grade);
+  saveProgress(p);
+}

@@ -4,7 +4,7 @@ import { xpPanel } from "../profile/xpPanel.ts";
 import { names } from "@re-tanx/sim";
 
 /** Mission result: outcome, objectives, score breakdown, grade, wallet. */
-export function showDebrief(host: HTMLElement, world: World, hooks: { onNext?(): void; onRetry(): void; onMenu(): void; xp?: MatchResult; replay?: ReplayHooks }): void {
+export function showDebrief(host: HTMLElement, world: World, hooks: { onNext?(): void; onRetry?(): void; onMenu(): void; menuLabel?: string; xp?: MatchResult; replay?: ReplayHooks }): void {
   const c = world.campaign!;
   const won = c.outcome === "won";
   const s = finalScore(world);
@@ -24,12 +24,12 @@ export function showDebrief(host: HTMLElement, world: World, hooks: { onNext?():
       <p class="grade-big">Grade <b>${s.grade}</b> · ${names.currency} <b class="bucks">${c.bucks}</b></p>` : `<p class="muted">Retry starts with the ${c.bucksOnEntry} ${names.currency} you brought in.</p>`}
     ${hooks.xp ? xpPanel(hooks.xp) : ""}
     <div class="row">${won && hooks.onNext ? `<button data-next>Next mission</button>` : ""}
-      <button data-retry class="${won ? "secondary" : ""}">${won ? "Replay" : "Retry"}</button>
-      <button data-menu class="secondary">Campaign</button>${replayButtons(hooks.replay)}</div>
+      ${hooks.onRetry ? `<button data-retry class="${won ? "secondary" : ""}">${won ? "Replay" : "Retry"}</button>` : ""}
+      <button data-menu class="secondary">${hooks.menuLabel ?? "Campaign"}</button>${replayButtons(hooks.replay)}</div>
   </div></div>`;
   if (hooks.onNext) host.querySelector("[data-next]")?.addEventListener("click", hooks.onNext);
-  host.querySelector("[data-retry]")!.addEventListener("click", hooks.onRetry);
+  if (hooks.onRetry) host.querySelector("[data-retry]")!.addEventListener("click", hooks.onRetry);
   host.querySelector("[data-menu]")!.addEventListener("click", hooks.onMenu);
   bindReplayButtons(host, hooks.replay);
-  host.querySelector<HTMLButtonElement>("[data-next], [data-retry]")!.focus();
+  host.querySelector<HTMLButtonElement>("[data-next], [data-retry], [data-menu]")!.focus();
 }

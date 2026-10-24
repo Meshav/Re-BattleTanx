@@ -5,6 +5,10 @@ import { createWorld } from "../world.ts";
 import { stepWorld } from "../stepWorld.ts";
 import { gangIds } from "../data/gangDefs.ts";
 import { applySnapshot, makeSnapshot, structureStages } from "./snapshot.ts";
+import { campaignMissions } from "../data/missions.ts";
+import { createMissionWorld } from "../campaign/createMission.ts";
+import { createCampaignState } from "../campaign/state.ts";
+import { deployTank } from "../campaign/deploy.ts";
 
 const full = (w: Parameters<typeof structureStages>[0]) => ({ meId: w.tanks[0]!.id, full: true, stages: structureStages(w), pickups: true });
 const delta = { meId: undefined, full: false, stages: undefined, pickups: false };
@@ -54,5 +58,20 @@ describe("snapshots", () => {
     for (let i = 0; i < 300; i++) stepWorld(w);
     const bytes = JSON.stringify(makeSnapshot(w, delta)).length;
     expect(bytes * 20).toBeLessThan(40_000);
+  });
+
+  it("campaign co-op: objectives, wallet and pending redeploys reach the mirror", () => {
+    const mission = campaignMissions[2]!;
+    const w = createMissionWorld({ mission, players: ["m1", "moto"], bucks: 200, difficulty: "normal", seed: 3 });
+    for (let i = 0; i < 30; i++) stepWorld(w);
+    w.tanks[1]!.alive = false;
+    expect(deployTank(w, w.tanks[1]!.id, "m1")).toBe(true);
+    w.campaign!.objectives[0]!.done = true;
+    const mirror = createWorld(parseMap(mission.map), [], { mode: { kind: "campaign" }, campaign: createCampaignState(mission, 0, "normal") });
+    applySnapshot(mirror, JSON.parse(JSON.stringify(makeSnapshot(w, full(w)))));
+    expect(mirror.campaign!.bucks).toBe(w.campaign!.bucks);
+    expect(mirror.campaign!.pendingDeploy).toEqual({ [w.tanks[1]!.id]: "m1" });
+    expect(mirror.campaign!.objectives[0]!.done).toBe(true);
+    expect(mirror.campaign!.mission.id).toBe(mission.id);
   });
 });

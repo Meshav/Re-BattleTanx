@@ -16,7 +16,7 @@ export function stepMines(world: World): SimEvent[] {
     const victim = world.tanks.find((t) => t.alive && t.team !== mine.team && dist(t.pos, mine.pos) <= def.triggerRadius + tankDefs[t.kind].radius * 0.5);
     if (!victim) return true;
     events.push({ type: "mineTrigger", pos: { ...mine.pos } });
-    events.push(...applySplash(world, { pos: mine.pos, radius: def.splash, damage: def.damage, sourceId: mine.ownerId, direct: victim }));
+    events.push(...applySplash(world, { pos: mine.pos, radius: def.splash, damage: def.damage, sourceId: mine.ownerId, direct: victim, weapon: "mine" }));
     return false;
   });
   return events;

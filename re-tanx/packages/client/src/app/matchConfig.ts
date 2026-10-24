@@ -1,4 +1,4 @@
-import { gangIds, type Difficulty, type GangId, type ModeKind, type PerkId, type TankSlot } from "@re-tanx/sim";
+import { gangIds, type Difficulty, type GangId, type ModeKind, type Loadout, type TankSlot } from "@re-tanx/sim";
 
 export type Device = "kbm" | "keys" | "touch" | "pad0" | "pad1" | "pad2" | "pad3";
 export type Teams = "ffa" | "coop";
@@ -8,7 +8,7 @@ export interface LocalPlayerCfg { gang: GangId; device: Device }
 export interface MatchConfig {
   mode: ModeKind; scoreLimit: number; teams: Teams;
   players: LocalPlayerCfg[]; bots: number; difficulty: Difficulty;
-  /** P1's profile perk loadout applies (off = Classic) */
+  /** P1's loadout applies: perks, weapon levels, tank-rank upgrades, Oracle (off = Arcade: everyone stock) */
   perks?: boolean;
   map?: string;
 }
@@ -19,12 +19,12 @@ export const DEVICE_LABEL: Record<Device, string> = {
 
 export const defaultConfig = (): MatchConfig => ({
   mode: "deathmatch", scoreLimit: 7, teams: "ffa",
-  players: [{ gang: "ironHounds", device: isTouchDevice() ? "touch" : "kbm" }], bots: 3, difficulty: "normal",
+  players: [{ gang: "ironHounds", device: isTouchDevice() ? "touch" : "kbm" }], bots: 3, difficulty: "normal", perks: true,
 });
 
 /** Humans first (so their tank ids are known), then bots on rotating gangs. */
-export function toSlots(cfg: MatchConfig, p1Perks: PerkId[] = []): TankSlot[] {
-  const humans: TankSlot[] = cfg.players.map((p, i) => ({ team: cfg.teams === "ffa" ? i : 0, gang: p.gang, name: `P${i + 1}`, ...(i === 0 ? { perks: p1Perks } : {}) }));
+export function toSlots(cfg: MatchConfig, p1: Loadout = {}): TankSlot[] {
+  const humans: TankSlot[] = cfg.players.map((p, i) => ({ team: cfg.teams === "ffa" ? i : 0, gang: p.gang, name: `P${i + 1}`, ...(i === 0 ? p1 : {}) }));
   const bots: TankSlot[] = Array.from({ length: cfg.bots }, (_, i) => ({
     team: cfg.teams === "ffa" ? cfg.players.length + i : 1,
     gang: gangIds[(i + cfg.players.length) % gangIds.length]!,

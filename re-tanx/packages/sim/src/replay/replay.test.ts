@@ -12,7 +12,8 @@ import { createBot } from "../ai/botState.ts";
 
 describe("replays", () => {
   it("playback reproduces the live match exactly", () => {
-    const slots: TankSlot[] = [{ team: 0, gang: "ironHounds" }, { team: 1, gang: "ironHounds", bot: "hard" }, { team: 2, gang: "ironHounds", bot: "normal" }];
+    // the human brings weapon upgrades: levels climbing mid-match must replay identically too
+    const slots: TankSlot[] = [{ team: 0, gang: "ironHounds", weaponXp: { guided: 30, swarm: 1e6, mine: 5 } }, { team: 1, gang: "ironHounds", bot: "hard" }, { team: 2, gang: "ironHounds", bot: "normal" }];
     const opts = { seed: 77, mode: { kind: "deathmatch" as const } };
     const live = createWorld(parseMap(mapById("graybox")), slots, opts);
     const rec = createRecorder({ map: "graybox", slots, opts }, 1);
@@ -34,7 +35,12 @@ describe("replays", () => {
 
   it("campaign replays carry redeploys; online replays carry bot takeovers", () => {
     const mission = campaignMissions.find((m) => m.id === "a1m12")!;
-    const setup = { id: mission.id, players: ["moto" as const], bucks: 5000, difficulty: "hard" as const, seed: 9 };
+    // with a full loadout and Oracles on the wingmen: all of it must replay exactly
+    const setup = {
+      id: mission.id, players: ["moto" as const], bucks: 5000, difficulty: "hard" as const, seed: 9, names: ["Ace"],
+      loadouts: [{ perks: ["treads" as const], pros: ["treads" as const], weaponXp: { guided: 40 }, mastery: { moto: 100 }, oracle: { id: "vesper" as const, bond: 4 } }],
+      allyOracles: [{ id: "ione" as const, bond: 2 }],
+    };
     const live = createMissionWorld({ ...setup, mission });
     const rec = createRecorder({ map: "", slots: [], opts: {}, mission: setup }, 1);
     let deploys = 0;
@@ -49,6 +55,7 @@ describe("replays", () => {
     const pb = playReplay(JSON.parse(JSON.stringify(rec.finish(live))));
     while (!pb.done) pb.step();
     expect(pb.world.campaign!.bucks).toBe(live.campaign!.bucks);
+    expect([pb.world.tanks[0]!.name, pb.world.tanks[0]!.oracle?.id, pb.world.tanks[1]!.oracle?.id]).toEqual(["Ace", "vesper", "ione"]);
     expect(pb.world.tanks.map((t) => [t.pos.x, t.hp, t.deaths])).toEqual(live.tanks.map((t) => [t.pos.x, t.hp, t.deaths]));
 
     // a versus player drops out at tick 100 and a bot takes over
@@ -71,5 +78,9 @@ describe("replays", () => {
     expect(isReplay({ version: 1, map: "x", slots: [], ticks: 3, inputs: [[[1, 2]]] })).toBe(false);
     expect(isReplay(null)).toBe(false);
     expect(isReplay({ version: 1, map: "graybox", slots: [{ team: 0, kind: "deathstar" }], ticks: 3, inputs: [] })).toBe(false);
+    expect(isReplay({ version: 1, map: "graybox", slots: [{ team: 0, weaponXp: { laser: 12 } }], ticks: 3, inputs: [] })).toBe(true);
+    expect(isReplay({ version: 1, map: "graybox", slots: [{ team: 0, weaponXp: { deathray: 12 } }], ticks: 3, inputs: [] })).toBe(false);
+    expect(isReplay({ version: 1, map: "graybox", slots: [{ team: 0, weaponXp: { laser: -1 } }], ticks: 3, inputs: [] })).toBe(false);
+    expect(isReplay({ version: 1, map: "graybox", slots: [{ team: 0, oracle: { id: "vesper", bond: 9 } }], ticks: 3, inputs: [] })).toBe(false);
   });
 });

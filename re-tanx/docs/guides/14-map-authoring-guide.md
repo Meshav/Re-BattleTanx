@@ -124,7 +124,7 @@ Nothing in the sim depends on how things look, so assets can be swapped in by ch
 | Asset | Stage 0 (intact) | Stage 1 (damaged) | Stage 2 (rubble) |
 |-------|------------------|-------------------|------------------|
 | Building (1–5 floors; regional sets: NYC, Midwest, Desert, Coastal, UK, France, Germany) | Whole building | Façade blown out, roof and upper floors gone, ~half height | Rubble pile under 1 m that clearly reads as drivable |
-| Wall | Intact segment (concrete, brick, chain-link + sandbags) | Holed and cracked, lower | Scattered blocks |
+| Wall (code-made brick placeholder in `wallModels.ts`) | Intact segment (concrete, brick, chain-link + sandbags) | Holed and cracked, lower | Scattered blocks |
 | Target (campaign: generator, transmitter, foundry) | Working machine, lights on | Smoking, sparking, broken | Burnt-out wreck |
 | Cache building (campaign) | Same as building | Same as building | Rubble with a visible crate |
 | Siege core | Glowing pylon | Cracked, flickering | Dead base |
@@ -145,7 +145,7 @@ Suggested file names: `bldg_<style>_s0.glb`, `bldg_<style>_s1.glb`, `bldg_<style
 | Water `~` | Animated water plane, shoreline edge pieces |
 | Fortress `a`–`d` | Team-coloured pad (9 m radius) + 4 pylons (exists as placeholder) |
 | Rail cannon | Twin rails + gun car (exists as placeholder) |
-| Pickups | Floating crates with an icon per kind (exist as placeholder) |
+| Pickups | Floating crates with an icon per kind (code-drawn pictograms in `pickupIcons.ts`; placeholder) |
 
 Props (cars, barrels, lamps, fences) are planned as decoration on `.` cells. They're visual only until a later version makes some of them destructible cover.
 

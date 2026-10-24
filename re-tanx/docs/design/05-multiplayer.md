@@ -48,7 +48,7 @@ Default team colours: Blue, Red, Green, Yellow (Original), with an Okabe–Ito c
 **Siege** ✅ *(as built)* — Always two teams. Defenders guard a 2500 HP core on their fortress for 4 minutes; attackers have infinite respawns and win if the core falls. *(Not built: multiple generators, limited defender tanks, repair stations.)*
 
 ## 5.3 Match settings (lobby options)
-Built ✅: map (5 arenas + player-made arenas), mode, score limit (0 = mode default), bot count (0–7) and difficulty, teams (FFA / humans vs bots), perks on/off ("Classic"), **Ranked**, **Public**.
+Built ✅: map (5 arenas + player-made arenas), mode, score limit (0 = mode default), bot count (0–7) and difficulty, teams (FFA / humans vs bots), upgrades on/off (off = "Arcade": no perks or weapon levels), **Ranked**, **Public**.
 Not built ⏳: time-limit override, power-up rules, unlimited ammo, friendly fire, gang lock, tank restrictions, respawn delay, radar always-on.
 
 ## 5.4 Lobby & matchmaking

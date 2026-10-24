@@ -1,4 +1,4 @@
-import { applyMatch, displayRating, newRating, rateMatch, today, type MatchResult, type World } from "@re-tanx/sim";
+import { applyMatch, displayRating, finalScore, newRating, rateMatch, today, type MatchResult, type World } from "@re-tanx/sim";
 import type { Services } from "../services.ts";
 import type { MatchRecord } from "../persist/profileStore.ts";
 import { send } from "../client.ts";
@@ -28,7 +28,8 @@ export async function awardMatch(m: Match, world: World, svc: Services): Promise
     await svc.store.update(seat.profileId, (p) => {
       const named = { ...p, name: seat.name };
       if (!c) return rated ? { ...named, rating: rated.after[i] } : named; // left early: rating still counts, no XP
-      result = applyMatch(named, world, seat.tankId, { botsOnly: humans <= 1, day: today() });
+      const grade = world.campaign?.outcome === "won" ? finalScore(world).grade : undefined;
+      result = applyMatch(named, world, seat.tankId, { botsOnly: humans <= 1, day: today(), ...(grade ? { grade } : {}) });
       if (rated) {
         result.profile.rating = rated.after[i];
         result.rating = { before: displayRating(rated.before[i]!), after: displayRating(rated.after[i]!) };

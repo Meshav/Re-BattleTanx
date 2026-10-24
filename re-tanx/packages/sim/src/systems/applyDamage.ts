@@ -10,9 +10,13 @@ import { dropLoot } from "../entities/pickup.ts";
 import { modeRules } from "../modes/registry.ts";
 import { perkMods } from "../progression/perks.ts";
 import { railArmor } from "../modes/rail.ts";
+import type { SpecialKind } from "../data/specialDefs.ts";
+import { weaponPower } from "../progression/levels.ts";
+import { weaponLevelIn } from "../progression/stats.ts";
 
 /** `raw`: damage-over-time (burn) — no armor, no direction, no 1-point minimum. */
-export interface DamageHit { target: Tank; amount: number; sourceId: number; from: Vec2; raw?: boolean }
+/** `weapon`: the special that dealt it — credited on the kill, scaled by the attacker's weapon level. */
+export interface DamageHit { target: Tank; amount: number; sourceId: number; from: Vec2; raw?: boolean; weapon?: SpecialKind | undefined }
 
 /** Front/side/rear multiplier from where the shot came relative to the hull. */
 export function directionalFactor(target: Tank, from: Vec2): number {
@@ -26,7 +30,7 @@ export function applyDamage(world: World, hit: DamageHit): SimEvent[] {
   const { target, sourceId } = hit;
   if (!target.alive) return [];
   const def = tankDefs[target.kind];
-  const scale = (modeRules[world.mode.kind].damageScale ?? 1) * (def.damageTaken ?? 1) * perkMods(target).damageTaken * attackerFactor(world, sourceId) * railArmor(world, target);
+  const scale = (modeRules[world.mode.kind].damageScale ?? 1) * (def.damageTaken ?? 1) * perkMods(target).damageTaken * attackerFactor(world, sourceId, hit.weapon) * railArmor(world, target);
   const armor = def.armor * perkMods(target).armor;
   const events: SimEvent[] = [];
   const base = hit.raw ? hit.amount * scale : Math.max(1, Math.round(hit.amount * directionalFactor(target, hit.from) * scale - armor));
@@ -45,24 +49,27 @@ export function applyDamage(world: World, hit: DamageHit): SimEvent[] {
   target.selected = undefined;
   target.shield = target.shieldTime = 0;
   const killer = world.tanks.find((t) => t.id === sourceId);
-  if (killer && killer.id !== target.id && killer.team !== target.team) killer.kills++;
-  events.push({ type: "kill", victimId: target.id, killerId: sourceId });
+  if (killer && killer.id !== target.id && killer.team !== target.team) {
+    killer.kills++;
+    if (killer.mastery) killer.mastery[killer.kind] = (killer.mastery[killer.kind] ?? 0) + 1; // rank upgrades land mid-match
+  }
+  events.push({ type: "kill", victimId: target.id, killerId: sourceId, ...(hit.weapon ? { weapon: hit.weapon } : {}) });
   events.push({ type: "explode", pos: { ...target.pos }, radius: 6 });
   return events;
 }
 
-/** Demolitionist hits tanks softer; Last Stand hits harder when nearly dead. */
-function attackerFactor(world: World, sourceId: number): number {
+/** Demolitionist hits tanks softer; Last Stand hits harder when nearly dead; upgraded specials hit harder. */
+function attackerFactor(world: World, sourceId: number, weapon: SpecialKind | undefined): number {
   const src = world.tanks.find((t) => t.id === sourceId);
   if (!src) return 1;
   const m = perkMods(src);
-  return m.tankDmg * (src.hp < maxHp(src) * 0.2 ? m.lowHpDmg : 1);
+  return m.tankDmg * (src.hp < maxHp(src) * 0.2 ? m.lowHpDmg : 1) * (weapon ? weaponPower(weaponLevelIn(world, src, weapon)) : 1);
 }
 
 /** Damage a structure on someone's behalf (credits the collapse, applies Demolitionist). */
-export function hitStructure(world: World, s: Structure, amount: number, by: number): SimEvent[] {
+export function hitStructure(world: World, s: Structure, amount: number, by: number, weapon?: SpecialKind): SimEvent[] {
   const src = world.tanks.find((t) => t.id === by);
-  return damageStructure(s, amount * perkMods(src).structureDmg, by);
+  return damageStructure(s, amount * perkMods(src).structureDmg * (src && weapon ? weaponPower(weaponLevelIn(world, src, weapon)) : 1), by);
 }
 
 /** Shield soaks damage first; returns what gets through. */

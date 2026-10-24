@@ -1,4 +1,4 @@
-import { idleInput, quantizeInput, createWorld, mapById, parseMap, applySnapshot, rules, tankDefs, type MapJson, type ModeKind, type ServerMsg, type World } from "@re-tanx/sim";
+import { idleInput, quantizeInput, createWorld, mapById, parseMap, applySnapshot, rules, tankDefs, type MapJson, type ModeKind, type Profile, type ServerMsg, type TankKind, type World, createCampaignState, missionById } from "@re-tanx/sim";
 import type * as THREE from "three";
 import { createBattleScene, disposeScene, toThree } from "../render/scene.ts";
 import { capturePoses, createWorldView, fadeFor, onSimEvents, renderWorld, syncViewerOnly, type Poses } from "../render/worldView.ts";
@@ -7,7 +7,9 @@ import { updateTankView } from "../render/views/tankView.ts";
 import { updateChaseCam } from "../render/camera/chaseCam.ts";
 import { addShake, shakeOffset } from "../render/fx/shake.ts";
 import { hudEvents, updateHud } from "../hud/hud.ts";
-import { playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
+import { play, playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
+import { redeployPrompt } from "../app/campaign/deployScreen.ts";
+import { createLiveProgress, liveProgressEvents, type LiveProgress } from "../hud/liveProgress.ts";
 import { startLoop } from "../loop.ts";
 import { anyPadStart, createLocalPlayer, peekInput, placePlayer, readInput, toggleCamera, wantsCameraToggle, type Devices, type LocalPlayer } from "../app/localPlayer.ts";
 import { cameraPose } from "../app/cameraPose.ts";
@@ -20,12 +22,22 @@ import type { Socket } from "./socket.ts";
 
 const SNAP_MS = 50;
 
+export interface OnlineHooks {
+  onOver(w: World): void; onLeave(): void; profile: Profile | undefined; upgrades: boolean;
+  /** campaign co-op: the mission id, and how to buy the next tank (asks the server) */
+  mission?: string | undefined; deploy(k: TankKind): void;
+}
+
 export interface OnlineMatch { onServer(m: ServerMsg): void; stop(): void; /** the result screen is up (no point rejoining) */ over(): boolean }
 
 /** Render the server's match: mirror world from snapshots, predicted own tank, interpolated everyone else. */
-export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind, mapId: string | MapJson, renderer: THREE.WebGLRenderer, devices: Devices, sfx: Sfx, hooks: { onOver(w: World): void; onLeave(): void }): OnlineMatch {
-  const mirror = createWorld(parseMap(typeof mapId === "string" ? mapById(mapId) : mapId), [], { mode: { kind: mode } });
-  const scene = createBattleScene();
+export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind, mapId: string | MapJson, renderer: THREE.WebGLRenderer, devices: Devices, sfx: Sfx, hooks: OnlineHooks): OnlineMatch {
+  const mission = hooks.mission ? missionById(hooks.mission) : undefined;
+  const map = mission?.map ?? (typeof mapId === "string" ? mapById(mapId) : mapId);
+  // campaign co-op: the mission's state arrives in snapshots; the mirror only needs somewhere to put it
+  const mirror = createWorld(parseMap(map), [], { mode: { kind: mode }, ...(mission ? { campaign: createCampaignState(mission, 0, "normal") } : {}) });
+  const scene = createBattleScene(mission?.fog);
+  const deploys = new Map<number, () => void>();
   const view = createWorldView(scene, mirror);
   const host = document.querySelector<HTMLElement>("#hud")!;
   host.innerHTML = `<div class="net-status" data-net></div>`;
@@ -35,6 +47,7 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
   const shake = { amount: 0 };
   const pause = createPauseMenu(host, { onQuit: () => { stop(); hooks.onLeave(); } }, "Menu", "Leave match");
   let player: LocalPlayer | undefined;
+  let live: LiveProgress | undefined;
   let snapPrev: Poses = new Map();
   let lastSnapAt = performance.now(), rtt = 0, overShown = false, prevSnapTick = 0;
   let stopped = false, resultsTimer: ReturnType<typeof setTimeout> | undefined;
@@ -53,6 +66,10 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
       const device = isTouchDevice() ? "touch" : navigator.getGamepads?.()[0] ? "pad0" : "kbm";
       if (device === "touch") devices.touch = createTouch(host);
       player = createLocalPlayer(me, device, host, names);
+      if (hooks.profile) {
+        live = createLiveProgress(player.hudRoot, hooks.profile, myTankId, mirror);
+        if (hooks.upgrades) player.hud.weaponXp = live.tally.weaponXp;
+      }
       layout();
     }
     reconcile(pred, mirror, me, m.ack);
@@ -64,6 +81,7 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
       updateEngine(sfx, me);
     }
     if (player) hudEvents(player.hud, m.events, mirror);
+    if (live && liveProgressEvents(live, m.events, mirror)) play(sfx, "ui_confirm");
     if (mirror.mode.over && !overShown) {
       overShown = true;
       resultsTimer = setTimeout(() => hooks.onOver(mirror), 2000);
@@ -97,6 +115,7 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
       syncViewerOnly(view, mirror, player.tank);
       fadeFor(view, player.camera, toThree(pose.x, pose.y, 1.5));
       updateHud(player.hud, player.tank, mirror);
+      if (mirror.campaign) redeployPrompt(player, mirror, deploys, hooks.deploy);
       renderer.setScissorTest(false);
       renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
       renderer.render(scene, player.camera);

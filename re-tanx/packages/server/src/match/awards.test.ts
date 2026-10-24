@@ -19,7 +19,7 @@ describe("server XP", () => {
     const store = createMemoryStore();
     const [a, b] = [fakeClient(1, "alice"), fakeClient(2, "bob")];
     const m = createMatch(mapJson as MapJson, { mode: "deathmatch", scoreLimit: 7, bots: 0, difficulty: "easy", teams: "ffa", perks: false, map: "graybox", ranked: false, public: false }, [a, b]);
-    m.world.stats[m.seats[0]!.tankId] = { kills: 7, deaths: 0, structures: 3, specials: 0, pickups: 0, queens: 0, damage: 0, killsByKind: { m1: 7 } };
+    m.world.stats[m.seats[0]!.tankId] = { kills: 7, deaths: 0, structures: 3, specials: 0, pickups: 0, queens: 0, damage: 0, killsByKind: { m1: 7 }, weaponXp: {} };
     Object.assign(m.world.mode, { over: true, winner: m.world.tanks[0]!.team });
     await awardMatch(m, m.world, { tokens: createTokens("t"), store });
     expect((await store.get("alice")).totals).toMatchObject({ matches: 1, wins: 1, kills: 7 });

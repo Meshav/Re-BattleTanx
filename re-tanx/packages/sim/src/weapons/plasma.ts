@@ -15,7 +15,7 @@ export function firePlasma(world: World, tank: Tank, isSuper: boolean): SimEvent
     const dir = fromAngle(rot);
     world.projectiles.push({
       id: world.nextId++, ownerId: tank.id, pos: add(tank.pos, scale(dir, tankDefs[tank.kind].radius + 1)),
-      vel: scale(dir, def.speed), damage: def.damage, splash: def.splash, ttl: def.range / def.speed,
+      vel: scale(dir, def.speed), damage: def.damage, splash: def.splash, ttl: def.range / def.speed, weapon: "plasma",
     });
   }
   return [{ type: "special", tankId: tank.id, kind: "plasma", super: isSuper, pos: { ...tank.pos } }];

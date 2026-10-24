@@ -47,9 +47,9 @@ function sweep(world: World, p: Projectile): SweepHit | undefined {
 }
 
 function impact(world: World, p: Projectile, tank: Tank | undefined, structure: Structure | undefined): SimEvent[] {
-  if (p.splash > 0) return applySplash(world, { pos: p.pos, radius: p.splash, damage: p.damage, sourceId: p.ownerId, direct: tank, directStructure: structure });
+  if (p.splash > 0) return applySplash(world, { pos: p.pos, radius: p.splash, damage: p.damage, sourceId: p.ownerId, direct: tank, directStructure: structure, weapon: p.weapon });
   const events: SimEvent[] = [{ type: "explode", pos: { ...p.pos }, radius: 1 }];
-  if (tank) events.push(...applyDamage(world, { target: tank, amount: p.damage, sourceId: p.ownerId, from: p.pos }));
-  if (structure) events.push(...hitStructure(world, structure, p.damage, p.ownerId));
+  if (tank) events.push(...applyDamage(world, { target: tank, amount: p.damage, sourceId: p.ownerId, from: p.pos, weapon: p.weapon }));
+  if (structure) events.push(...hitStructure(world, structure, p.damage, p.ownerId, p.weapon));
   return events;
 }

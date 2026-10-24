@@ -2,7 +2,7 @@
 
 What the repo does today, measured against docs 01–12 and 14. Per-section detail is in the repo's `CHANGES_LOG.md` (S01–S32).
 
-## Built and tested (265 automated tests in 45 files, run 23 Oct 2026, + headless-browser checks per feature)
+## Built and tested (268 automated tests in 46 files, run 23 Oct 2026, + headless-browser checks per feature)
 | Area | Status |
 |------|--------|
 | Core sim | Deterministic 30 Hz sim. All tanks, guns, specials, pickups, destruction, rubble, water/hover |

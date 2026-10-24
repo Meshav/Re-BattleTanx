@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { InputState, Tank, World } from "@re-tanx/sim";
+import { tankDefs, type InputState, type Tank, type World } from "@re-tanx/sim";
 import type { Device } from "./matchConfig.ts";
 import { CAM_MODES, createChaseCam, type ChaseCam } from "../render/camera/chaseCam.ts";
 import { createHud, type Hud } from "../hud/hud.ts";
@@ -11,6 +11,7 @@ import { arcadeInput } from "../control/arcade.ts";
 import { classicInput, ARROW_KEYS } from "../control/classic.ts";
 import { twinStickInput } from "../control/twinStick.ts";
 import { touchInput } from "../control/touchStick.ts";
+import { rampSteer } from "../control/steerRamp.ts";
 import { takeTap, type Touch } from "../input/touch.ts";
 import { mouseGroundPoint } from "../aim.ts";
 import { settings } from "../settings/settings.ts";
@@ -19,6 +20,8 @@ import { settings } from "../settings/settings.ts";
 export interface LocalPlayer {
   tank: Tank; device: Device; cam: ChaseCam; camera: THREE.PerspectiveCamera;
   hud: Hud; hudRoot: HTMLElement; rect: Rect; lastPad: PadState | undefined;
+  /** keyboard steering after the ramp (see rampSteer) */
+  steer: number;
 }
 
 export function createLocalPlayer(tank: Tank, device: Device, hudHost: HTMLElement, names: (id: number) => string): LocalPlayer {
@@ -27,7 +30,7 @@ export function createLocalPlayer(tank: Tank, device: Device, hudHost: HTMLEleme
   hudHost.appendChild(hudRoot);
   return {
     tank, device, cam: createChaseCam(), camera: new THREE.PerspectiveCamera(60, 1, 0.5, 600),
-    hud: createHud(hudRoot, names), hudRoot, rect: { x: 0, y: 0, w: 1, h: 1 }, lastPad: undefined,
+    hud: createHud(hudRoot, names), hudRoot, rect: { x: 0, y: 0, w: 1, h: 1 }, lastPad: undefined, steer: 0,
   };
 }
 
@@ -50,11 +53,17 @@ export function peekInput(p: LocalPlayer, d: Devices, world: World): InputState 
 }
 
 export function readInput(p: LocalPlayer, d: Devices, world: World, preview = false): InputState {
+  const keys = (input: InputState): InputState => {
+    if (tankDefs[p.tank.kind].hover) return input; // hover steering already eases toward the aim
+    const steer = rampSteer(p.steer, input.steer, world.dt);
+    if (!preview) p.steer = steer;
+    return { ...input, steer };
+  };
   if (p.device === "kbm") {
     d.mouse.moved = false;
-    return arcadeInput(d.kb, d.mouse, p.tank, mouseGroundPoint(d.mouse, p.camera, p.rect));
+    return keys(arcadeInput(d.kb, d.mouse, p.tank, mouseGroundPoint(d.mouse, p.camera, p.rect)));
   }
-  if (p.device === "keys") return classicInput(d.kb, ARROW_KEYS, p.tank, world);
+  if (p.device === "keys") return keys(classicInput(d.kb, ARROW_KEYS, p.tank, world));
   if (p.device === "touch") return d.touch ? touchInput(d.touch, p.tank, p.cam.yaw) : classicInput(d.kb, ARROW_KEYS, p.tank, world);
   const pad = readPad(Number(p.device.slice(3)));
   if (!preview && pad.back && !p.lastPad?.back) toggleCamera(p);

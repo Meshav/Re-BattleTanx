@@ -24,7 +24,7 @@ export function detonate(world: World, n: Nuke): SimEvent[] {
   for (const t of world.tanks) {
     const k = Math.min(1, dist(t.pos, n.pos) / def.radius);
     const amount = def.damage + (def.edgeDamage - def.damage) * k;
-    events.push(...applyDamage(world, { target: t, amount, sourceId: n.ownerId, from: n.pos }));
+    events.push(...applyDamage(world, { target: t, amount, sourceId: n.ownerId, from: n.pos, weapon: "nuke" }));
   }
   const c = world.map.cell;
   for (const s of world.structures) {

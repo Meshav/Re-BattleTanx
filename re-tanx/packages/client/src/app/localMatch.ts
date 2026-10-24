@@ -1,4 +1,4 @@
-import { createRecorder, createWorld, parseMap, quantizeInput, rules, stepWorld, tankDefs, type Playback, type Recorder, type Replay, type SimEvent, type World } from "@re-tanx/sim";
+import { createRecorder, createWorld, loadoutOf, parseMap, quantizeInput, rules, stepWorld, tankDefs, type Playback, type Recorder, type Replay, type SimEvent, type World } from "@re-tanx/sim";
 import type * as THREE from "three";
 import { createBattleScene, disposeScene, toThree } from "../render/scene.ts";
 import { capturePoses, createWorldView, fadeFor, onSimEvents, renderWorld, syncViewerOnly } from "../render/worldView.ts";
@@ -6,7 +6,8 @@ import { updateChaseCam } from "../render/camera/chaseCam.ts";
 import { addShake, shakeOffset } from "../render/fx/shake.ts";
 import { layoutViewports } from "../render/viewports.ts";
 import { hudEvents, updateHud } from "../hud/hud.ts";
-import { playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
+import { play, playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
+import { createLiveProgress, liveProgressEvents } from "../hud/liveProgress.ts";
 import { startLoop } from "../loop.ts";
 import { toSlots, type Device, type MatchConfig } from "./matchConfig.ts";
 import { anyPadStart, clearMouseClicks, createLocalPlayer, peekInput, placePlayer, readInput, toggleCamera, wantsCameraToggle, type Devices, type LocalPlayer } from "./localPlayer.ts";
@@ -30,7 +31,7 @@ export interface MatchHooks {
 /** Versus match from menu settings. */
 export function startLocalMatch(cfg: MatchConfig, renderer: THREE.WebGLRenderer, devices: Devices, sfx: Sfx, hooks: MatchHooks): () => void {
   const map = cfg.map ?? "graybox";
-  const slots = toSlots(cfg, loadProfile().perks);
+  const slots = toSlots(cfg, loadoutOf(loadProfile()));
   const opts = {
     seed: (Date.now() & 0xffff) || 1, perks: cfg.perks === true,
     mode: { kind: cfg.mode, countdown: true, ...(cfg.scoreLimit > 0 ? { scoreLimit: cfg.scoreLimit } : {}) },
@@ -58,6 +59,9 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
   const names = (id: number) => world.tanks.find((t) => t.id === id)?.name ?? "?";
   const players: LocalPlayer[] = deviceList.map((d, i) => createLocalPlayer(world.tanks[i]!, d, hudHost, names));
   if (deviceList.includes("touch")) devices.touch = createTouch(hudHost);
+  // only P1 earns XP locally (see awardLocal); replays don't
+  const live = opts.playback ? undefined : createLiveProgress(players[0]!.hudRoot, loadProfile(), players[0]!.tank.id, world);
+  if (live && players[0]!.tank.weaponXp) players[0]!.hud.weaponXp = live.tally.weaponXp; // badges only when upgrades are on
   const shake = { amount: 0 };
   const pause = createPauseMenu(hudHost, { onQuit: () => { stop(); hooks.onQuit(); } });
   let prev = capturePoses(world);
@@ -84,6 +88,7 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
       playEvents(sfx, events, world, p0);
       updateEngine(sfx, p0);
       for (const p of players) hudEvents(p.hud, events, world);
+      if (live && liveProgressEvents(live, events, world)) play(sfx, "ui_confirm");
       if ((world.mode.over || opts.playback?.done) && !overAt) overAt = performance.now();
     },
     render(alpha, dt) {

@@ -6,6 +6,8 @@
     "beats": 5,
     "digits": 3
   },
+  "brakeFactor": 4,
+  "keySteerRamp": 0.2,
   "rammingMinSpeed": 6,
   "rammingFactor": 2,
   "selfSplashFactor": 0.5,

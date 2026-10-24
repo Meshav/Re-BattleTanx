@@ -4,6 +4,7 @@ import type { Vec2 } from "../math/vec2.ts";
 import type { RayHit } from "../queries/raycast.ts";
 import type { Turret } from "../entities/turret.ts";
 import { applyDamage, hitStructure } from "./applyDamage.ts";
+import type { SpecialKind } from "../data/specialDefs.ts";
 
 export function damageTurret(t: Turret, amount: number): SimEvent[] {
   t.hp -= amount;
@@ -11,9 +12,9 @@ export function damageTurret(t: Turret, amount: number): SimEvent[] {
 }
 
 /** Apply a direct hit to whatever a ray found. */
-export function damageAt(world: World, hit: RayHit, amount: number, sourceId: number, from: Vec2): SimEvent[] {
-  if (hit.kind === "tank") return applyDamage(world, { target: hit.tank, amount, sourceId, from });
+export function damageAt(world: World, hit: RayHit, amount: number, sourceId: number, from: Vec2, weapon?: SpecialKind): SimEvent[] {
+  if (hit.kind === "tank") return applyDamage(world, { target: hit.tank, amount, sourceId, from, weapon });
   if (hit.kind === "turret") return damageTurret(hit.turret, amount);
-  if (hit.kind === "structure" && hit.structure) return hitStructure(world, hit.structure, amount, sourceId);
+  if (hit.kind === "structure" && hit.structure) return hitStructure(world, hit.structure, amount, sourceId, weapon);
   return [];
 }

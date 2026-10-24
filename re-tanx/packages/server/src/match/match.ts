@@ -1,8 +1,9 @@
 import {
   createBot, createLagComp, createRecorder, createWorld, makeSnapshot, parseMap, pickupsKey, rules, stepWorld, structureStages,
-  PROTOCOL_LIMITS, type LobbySettings, type MapJson, type Recorder, type SimEvent, type TankSlot, type World, gangIds,
+  PROTOCOL_LIMITS, type LobbySettings, type MapJson, type Recorder, type SimEvent, type TankSlot, type World, gangIds, loadoutOf, createMissionWorld, missionById,
 } from "@re-tanx/sim";
 import { createQueue, nextInput, type InputQueue } from "./inputs.ts";
+import { missionSetupFor } from "./campaignMatch.ts";
 import { send, type Client } from "../client.ts";
 
 const SNAP_HZ = 20;
@@ -11,10 +12,11 @@ const FULL_EVERY_TICKS = 30;
 interface Seat { client: Client | undefined; profileId: string | undefined; name: string; tankId: number; /** dropped connection: can reclaim the tank until this time (ms) */ awayUntil: number | undefined; queue: InputQueue; sentStages: string; sentPickups: string; full: boolean }
 
 /** One running game: a World, its seats, and a 30 Hz ticker. Nothing is shared between matches. */
-export interface Match { world: World; startedAt: number; ranked: boolean; customMap: MapJson | undefined; seats: Seat[]; timer: NodeJS.Timeout | undefined; snapAcc: number; events: SimEvent[]; overAt: number; recorder: Recorder }
+export interface Match { world: World; startedAt: number; ranked: boolean; customMap: MapJson | undefined; /** campaign co-op mission id */ mission?: string | undefined; seats: Seat[]; timer: NodeJS.Timeout | undefined; snapAcc: number; events: SimEvent[]; overAt: number; recorder: Recorder }
 
 export function createMatch(map: MapJson, settings: LobbySettings, members: Client[]): Match {
-  const humans: TankSlot[] = members.map((c, i) => ({ team: settings.teams === "ffa" ? i : 0, gang: c.gang, name: c.name, perks: c.perks }));
+  if (settings.mode === "campaign") return createCoopMission(settings, members);
+  const humans: TankSlot[] = members.map((c, i) => ({ team: settings.teams === "ffa" ? i : 0, gang: c.gang, name: c.name, ...(c.profile ? loadoutOf(c.profile, c.perks, c.oracle) : { perks: c.perks }) }));
   const bots: TankSlot[] = Array.from({ length: settings.bots }, (_, i) => ({
     team: settings.teams === "ffa" ? members.length + i : 1, gang: gangIds[(i + members.length) % gangIds.length]!, bot: settings.difficulty,
   }));
@@ -25,6 +27,15 @@ export function createMatch(map: MapJson, settings: LobbySettings, members: Clie
   world.lagComp = createLagComp();
   const seats = members.map((client, i) => ({ client, profileId: client.profileId, name: client.name, tankId: world.tanks[i]!.id, awayUntil: undefined, queue: createQueue(), sentStages: "", sentPickups: "", full: true }));
   return { world, startedAt: Date.now(), ranked: settings.ranked, customMap: settings.customMap, seats, timer: undefined, snapAcc: 0, events: [], overAt: 0, recorder: createRecorder({ map: map.id, slots, opts, lagComp: true, ...(settings.customMap ? { customMap: settings.customMap } : {}) }, seats.length) };
+}
+
+/** Campaign co-op: the mission world (humans first, then the wingmen), recorded as a mission replay. */
+function createCoopMission(settings: LobbySettings, members: Client[]): Match {
+  const setup = missionSetupFor(settings, members, (Date.now() & 0x7fffffff) || 1);
+  const world = createMissionWorld({ ...setup, mission: missionById(setup.id)! });
+  world.lagComp = createLagComp();
+  const seats = members.map((client, i) => ({ client, profileId: client.profileId, name: client.name, tankId: world.tanks[i]!.id, awayUntil: undefined, queue: createQueue(), sentStages: "", sentPickups: "", full: true }));
+  return { world, startedAt: Date.now(), ranked: false, customMap: undefined, mission: setup.id, seats, timer: undefined, snapAcc: 0, events: [], overAt: 0, recorder: createRecorder({ map: "", slots: [], opts: {}, lagComp: true, mission: setup }, seats.length) };
 }
 
 export function runMatch(m: Match, mapId: string, onEnd: () => void, onFinish: (m: Match) => void = () => {}): void {
@@ -104,5 +115,5 @@ export function stopMatch(m: Match): void {
 }
 
 export function sendStart(m: Match, c: Client, tankId: number, mapId: string): void {
-  send(c, { t: "start", mapId, tankId, seed: m.world.rng.state, mode: m.world.mode.kind, ...(m.customMap ? { map: m.customMap } : {}) });
+  send(c, { t: "start", mapId, tankId, seed: m.world.rng.state, mode: m.world.mode.kind, ...(m.customMap ? { map: m.customMap } : {}), ...(m.mission ? { mission: m.mission } : {}) });
 }

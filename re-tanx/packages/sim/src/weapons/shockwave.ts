@@ -17,7 +17,7 @@ export function shockwave(world: World, tank: Tank, kind: "shock" | "edge"): Sim
     const d = dist(t.pos, tank.pos);
     if (!t.alive || t.team === tank.team || d > def.radius) continue;
     const k = 1 - d / def.radius;
-    events.push(...applyDamage(world, { target: t, amount: def.damage * (0.5 + k / 2), sourceId: tank.id, from: tank.pos }));
+    events.push(...applyDamage(world, { target: t, amount: def.damage * (0.5 + k / 2), sourceId: tank.id, from: tank.pos, weapon: kind }));
     const push = def.knockback * k;
     t.pos.x += ((t.pos.x - tank.pos.x) / (d || 1)) * push;
     t.pos.y += ((t.pos.y - tank.pos.y) / (d || 1)) * push;

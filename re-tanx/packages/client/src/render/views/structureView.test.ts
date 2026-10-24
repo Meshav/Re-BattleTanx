@@ -27,3 +27,24 @@ it("batches buildings, restores them for each viewport, and keeps destruction in
   expect(matrix.elements[5]).toBeCloseTo(0.8);
   expect(view.bounds[0]!.max.y).toBe(0.8);
 });
+
+it("draws walls with their stage model instead of the building box, and never fades them", () => {
+  const world = createWorld(parseMap({ id: "test", name: "test", cell: 10, rows: ["Sw#."] }), []);
+  const root = new THREE.Group();
+  const view = createStructureViews(world, root);
+  const wall = world.structures.findIndex((s) => s.kind === "wall");
+  expect(view.walls).toHaveLength(3);
+  expect(root.children).toHaveLength(5);
+  const m = new THREE.Matrix4();
+  const shown = () => view.walls.map((w) => (w.getMatrixAt(0, m), m.elements[5]! > 0));
+  expect(shown()).toEqual([true, false, false]);
+  view.solid.getMatrixAt(wall, m);
+  expect(m.elements[5]).toBe(0);
+  world.structures[wall]!.stage = 1;
+  syncStructures(view, world);
+  expect(shown()).toEqual([false, true, false]);
+  const cam = new THREE.PerspectiveCamera();
+  cam.position.set(15, 5, -10);
+  fadeOccluders(view, cam, new THREE.Vector3(15, 1, 20));
+  expect(view.occluded.has(wall)).toBe(false);
+});

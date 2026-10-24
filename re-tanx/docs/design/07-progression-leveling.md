@@ -6,7 +6,7 @@ The originals had no persistent progression. Add a **simple, honest** system tha
 
 ## 7.1 Principles
 1. **Unlock breadth, not height** — levels unlock options (gangs, tanks, cosmetics, perks), not raw stat inflation.
-2. **PvP fairness** — perks are sidegrades with trade-offs; ranked and "Classic" lobbies disable them. ✅ (ranked forces perks off server-side)
+2. **PvP fairness** — perks are sidegrades with trade-offs; ranked, quick-match and "Arcade" lobbies disable them (and weapon upgrades). ✅ (ranked forces Arcade server-side)
 3. **No monetization** — it's a fan project. Nothing for sale.
 4. **Everything works for guests** — ✅ guests have a signed token and a server profile; signing in with Discord/Google keeps it and makes it follow you across devices.
 
@@ -63,7 +63,7 @@ Up to 3 slots. Each perk has a cost so you can't stack every upside.
 | Last Stand | At <20% HP, +25% damage | Take +10% damage overall |
 | Oracle's Champion | +10% speed while carrying an Oracle | −5% max HP |
 
-Perks are **off** in Ranked and "Classic" lobbies; a host toggle elsewhere. Ghost Engine's upside shows on screen as "Bots hear you at half range".
+Perks and weapon upgrades are **off** in Ranked, quick-match and "Arcade" lobbies; the "Upgrades" toggle elsewhere (on by default in local, private and campaign play). Weapon levels V1–V5: each special earns XP per use and per kill made with it (`progression.json` `weaponXp`); in upgrade-on play each level adds `weaponPowerPerLevel` (+5%) — damage, or heal / duration / reach for utility specials — taking effect mid-match. Also upgrade-on only: tank-rank upgrades (`tankUpgrades`), perk PRO bonuses (per-perk challenge, levels I–III → PRO) and an Oracle companion (passive scaled by bond 1–5, gift at bond 3; unlocked by campaign missions or lifetime challenges). Perks unlock by level (`perk:x` unlock keys). Ghost Engine's upside shows on screen as "Bots hear you at half range".
 
 ## 7.6 Challenges ✅
 - **Daily** (3): the same set for everyone each UTC day, picked from a pool of 8 by a seeded rotation and advanced by match stats (kills, structures, matches, wins, Oracles, specials, pickups, missions).

@@ -18,13 +18,17 @@ import { tankKinds } from "../data/tankDefs.ts";
 import { gangIds } from "../data/gangDefs.ts";
 import { difficulties } from "../data/aiDefs.ts";
 import { perkIds } from "../progression/perks.ts";
+import { specialKinds } from "../data/specialDefs.ts";
+import { maxBond, oracleIds } from "../progression/oracles.ts";
+import type { Loadout } from "../progression/loadout.ts";
+import type { OracleLink } from "../entities/tank.ts";
 import { modeRules } from "../modes/registry.ts";
 
 /** [tick, throttle×100, steer×100, strafe×100, aim×1000, fire|special<<1, cycle, (view offset for lag compensation)] */
 type Packed = [number, number, number, number, number, number, number] | [number, number, number, number, number, number, number, number];
 
 /** A campaign mission is rebuilt from its id and the opening purchase instead of slots. */
-export interface MissionSetup { id: string; players: TankKind[]; bucks: number; difficulty: Difficulty; seed: number; countdown?: boolean }
+export interface MissionSetup { id: string; players: TankKind[]; bucks: number; difficulty: Difficulty; seed: number; countdown?: boolean; loadouts?: Loadout[]; allyOracles?: OracleLink[]; names?: string[] }
 
 /** [tick, human index, what]: a tank kind = campaign redeploy, "bot" = that player left and a bot took the tank, "human" = they rejoined. */
 export type ReplayAction = [number, number, string];
@@ -155,10 +159,19 @@ export function playReplay(r: Replay): Playback {
 
 const goodSlot = (s: TankSlot) => !!s && Number.isInteger(s.team) && s.team >= 0 && s.team < 16
   && (s.kind === undefined || tankKinds.includes(s.kind)) && (s.gang === undefined || gangIds.includes(s.gang))
-  && (s.bot === undefined || difficulties.includes(s.bot)) && (s.perks === undefined || (Array.isArray(s.perks) && s.perks.every((p) => perkIds.includes(p))));
+  && (s.bot === undefined || difficulties.includes(s.bot)) && goodLoadout(s);
+
+const perkList = (v: unknown) => v === undefined || (Array.isArray(v) && v.every((p) => perkIds.includes(p)));
+const counts = (v: unknown, keys: readonly string[]) => v === undefined || (typeof v === "object" && v !== null
+  && Object.entries(v).every(([k, n]) => keys.includes(k) && typeof n === "number" && Number.isFinite(n) && n >= 0));
+const goodOracle = (o: OracleLink) => !!o && oracleIds.includes(o.id) && Number.isInteger(o.bond) && o.bond >= 1 && o.bond <= maxBond;
+const goodLoadout = (l: Loadout) => !!l && perkList(l.perks) && perkList(l.pros) && counts(l.weaponXp, specialKinds) && counts(l.mastery, tankKinds)
+  && (l.oracle === undefined || goodOracle(l.oracle));
+const listOf = <T>(v: T[] | undefined, ok: (x: T) => boolean) => v === undefined || (Array.isArray(v) && v.length <= 4 && v.every(ok));
 
 const goodMission = (m: MissionSetup) => !!m && missionById(m.id) !== undefined && Array.isArray(m.players) && m.players.length >= 1 && m.players.length <= 4
-  && m.players.every((k) => tankKinds.includes(k)) && difficulties.includes(m.difficulty) && Number.isFinite(m.bucks) && Number.isInteger(m.seed);
+  && m.players.every((k) => tankKinds.includes(k)) && difficulties.includes(m.difficulty) && Number.isFinite(m.bucks) && Number.isInteger(m.seed)
+  && listOf(m.loadouts, goodLoadout) && listOf(m.allyOracles, goodOracle) && listOf(m.names, (n) => typeof n === "string" && n.length <= 24);
 
 /** Shape check for replays loaded from storage or a shared file (untrusted: a bad one must not crash the sim). */
 export function isReplay(v: unknown): v is Replay {

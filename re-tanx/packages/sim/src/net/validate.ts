@@ -8,6 +8,8 @@ import { versusMaps } from "../data/maps.ts";
 import { checkMap } from "../data/mapCheck.ts";
 import { clamp } from "../math/clamp.ts";
 import { quantizeInput } from "../replay/replay.ts";
+import { missionById } from "../data/missions.ts";
+import { tankKinds, type TankKind } from "../data/tankDefs.ts";
 
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null;
@@ -30,14 +32,17 @@ export const RANKED_MODES = ["deathmatch", "tankWars", "lastGang", "annihilation
 export function sanitizeSettings(v: unknown): LobbySettings {
   const o = isObj(v) ? v : {};
   const s = baseSettings(o);
+  // campaign co-op: invite-only, and upgrades always count (as in the local campaign)
+  if (s.mode === "campaign") return { ...s, ranked: false, public: false, perks: true };
   if (!s.ranked) return s;
   return { ...s, bots: 0, perks: false, teams: "ffa", mode: (RANKED_MODES as readonly string[]).includes(s.mode) ? s.mode : "deathmatch" };
 }
 
 function baseSettings(o: Obj): LobbySettings {
   const custom = o.customMap === undefined ? undefined : checkMap(o.customMap).map;
+  const mission = typeof o.mission === "string" && missionById(o.mission) ? o.mission : undefined;
   return {
-    mode: modeKinds.includes(o.mode as never) ? (o.mode as LobbySettings["mode"]) : "deathmatch",
+    mode: o.mode === "campaign" && mission ? "campaign" : modeKinds.includes(o.mode as never) ? (o.mode as LobbySettings["mode"]) : "deathmatch",
     scoreLimit: Math.round(num(o.scoreLimit, 0, 300, 0)), // 0 = the mode's default
     bots: Math.round(num(o.bots, 0, 7, 2)),
     difficulty: difficulties.includes(o.difficulty as never) ? (o.difficulty as LobbySettings["difficulty"]) : "normal",
@@ -47,6 +52,7 @@ function baseSettings(o: Obj): LobbySettings {
     ranked: o.ranked === true,
     public: o.public === true,
     ...(custom ? { customMap: custom } : {}),
+    ...(o.mode === "campaign" && mission ? { mission } : {}),
   };
 }
 
@@ -63,7 +69,9 @@ export function parseClientMsg(raw: string): ClientMsg | undefined {
   }
   if (!isObj(o) || typeof o.t !== "string") return undefined;
   switch (o.t) {
-    case "hello": return { t: "hello", name: cleanName(o.name), gang: gang(o.gang), ...(typeof o.token === "string" ? { token: o.token.slice(0, 80) } : {}), ...(Array.isArray(o.perks) ? { perks: o.perks.slice(0, 3) as never } : {}) };
+    case "hello": return { t: "hello", name: cleanName(o.name), gang: gang(o.gang), ...(typeof o.token === "string" ? { token: o.token.slice(0, 80) } : {}), ...(Array.isArray(o.perks) ? { perks: o.perks.slice(0, 3) as never } : {}), ...(typeof o.oracle === "string" ? { oracle: o.oracle.slice(0, 24) } : {}),
+      ...(Array.isArray(o.wingmen) ? { wingmen: o.wingmen.slice(0, 3).map((w) => String(w).slice(0, 24)) } : {}) };
+    case "deploy": return tankKinds.includes(o.kind as TankKind) ? { t: "deploy", kind: o.kind as TankKind } : undefined;
     case "create": return { t: "create", settings: sanitizeSettings(o.settings) };
     case "join": case "rejoin": return typeof o.code === "string" ? { t: o.t, code: o.code.toUpperCase().slice(0, PROTOCOL_LIMITS.codeLength) } : undefined;
     case "settings": return { t: "settings", settings: sanitizeSettings(o.settings) };

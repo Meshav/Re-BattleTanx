@@ -1,4 +1,4 @@
-import { activeGuided, modeRules, tankDefs, tankName, type SimEvent, type Tank, type World } from "@re-tanx/sim";
+import { activeGuided, maxHp, modeRules, tankDefs, tankName, type SimEvent, type SpecialKind, type Tank, type World } from "@re-tanx/sim";
 import { renderSpecials } from "./specials.ts";
 import { renderRoster } from "./roster.ts";
 import { drawMinimap } from "./minimap.ts";
@@ -14,6 +14,8 @@ export interface Hud {
   minimap: HTMLCanvasElement; feed: KillFeed; flash: HTMLElement; objective: HTMLElement; lastSpecials: string; lastRoster: string;
   heatBar: HTMLElement; heatFill: HTMLElement; status: HTMLElement; boss: HTMLElement; bossName: HTMLElement; bossFill: HTMLElement;
   countdown: HTMLElement; nextUpdate: number;
+  /** live weapon XP for V-level badges (the profile owner, when upgrades are on) */
+  weaponXp?: Partial<Record<SpecialKind, number>>;
 }
 
 export function createHud(root: HTMLElement, names: (id: number) => string): Hud {
@@ -58,7 +60,7 @@ export function updateHud(h: Hud, me: Tank, world: World): void {
   const now = performance.now();
   if (now < h.nextUpdate) return;
   h.nextUpdate = now + 50; // HUD/radar at 20 Hz; tank and camera still render every frame.
-  const max = tankDefs[me.kind].hp;
+  const max = maxHp(me);
   const pct = Math.max(0, me.hp / max);
   h.hpFill.style.width = `${pct * 100}%`;
   h.hpBar.classList.toggle("low", pct < 0.3);
@@ -70,9 +72,9 @@ export function updateHud(h: Hud, me: Tank, world: World): void {
   h.heatFill.style.width = `${me.heat}%`;
   h.status.textContent = statusLine(me);
   h.score.textContent = `Kills ${me.kills}  ·  Deaths ${me.deaths}`;
-  const sKey = JSON.stringify([me.specials, me.selected]);
+  const sKey = JSON.stringify([me.specials, me.selected, h.weaponXp]);
   if (sKey !== h.lastSpecials) {
-    renderSpecials(h.specials, me);
+    renderSpecials(h.specials, me, h.weaponXp);
     h.lastSpecials = sKey;
   }
   const rKey = `${me.gang}${me.rosterIndex}${me.roster.join()}`;

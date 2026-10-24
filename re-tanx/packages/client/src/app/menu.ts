@@ -1,9 +1,10 @@
-import { difficulties, gangDefs, gangIds, isUnlocked, levelFor, modeKinds, perkSlots, type GangId } from "@re-tanx/sim";
+import { difficulties, gangDefs, gangIds, isUnlocked, levelFor, modeKinds, type GangId } from "@re-tanx/sim";
 import { allArenas } from "./editor/customMaps.ts";
 import { loadProfile } from "./profile/localProfile.ts";
 import { DEVICE_LABEL, type Device, type MatchConfig } from "./matchConfig.ts";
 import { MODE_LABEL } from "./modeLabels.ts";
 import { esc } from "./esc.ts";
+import { bindLoadout, loadoutDetails } from "./profile/loadoutPicker.ts";
 import { settings } from "../settings/settings.ts";
 
 const devices = Object.keys(DEVICE_LABEL) as Device[];
@@ -43,10 +44,11 @@ export function showMenu(host: HTMLElement, cfg: MatchConfig, hooks: MenuHooks):
       <div class="row">
         <label>Bot opponents <input name="bots" type="number" min="0" max="7" value="${cfg.bots}"></label>
         <label>Bot difficulty <select name="difficulty">${opts(difficulties, cfg.difficulty)}</select></label>
-        <label>Perks <select name="perks"${perkSlots(level) ? "" : " disabled"}><option value="on"${cfg.perks ? " selected" : ""}>On (your loadout)</option><option value="off"${cfg.perks ? "" : " selected"}>Off (Classic)</option></select></label>
+        <label>Upgrades <select name="perks"><option value="on"${cfg.perks ? " selected" : ""}>On (perks + weapon levels)</option><option value="off"${cfg.perks ? "" : " selected"}>Off (Arcade, fair)</option></select></label>
       </div>
       <button type="submit">Start local match</button>
     </div></details>
+    ${loadoutDetails()}
     <div class="control-guide"><b>Your controls</b><p data-controls></p></div>
     <div class="menu-utilities"><button type="button" class="secondary" data-settings>Settings &amp; controls</button><button type="button" class="secondary" data-profile>Profile · Level ${level}</button></div>
     <details class="menu-section"><summary>Replays &amp; map editor</summary><div class="menu-options">
@@ -93,6 +95,7 @@ export function showMenu(host: HTMLElement, cfg: MatchConfig, hooks: MenuHooks):
       players, bots: num("bots", 0, 7), difficulty: f.get("difficulty") as MatchConfig["difficulty"], perks: f.get("perks") === "on", map: String(f.get("map")),
     });
   });
+  bindLoadout(host);
   host.querySelector("[data-online]")!.addEventListener("click", hooks.onOnline);
   // limits mean different things per mode (kills, points, waves): back to the mode default
   form.querySelector<HTMLSelectElement>("[name=mode]")!.addEventListener("change", () => {

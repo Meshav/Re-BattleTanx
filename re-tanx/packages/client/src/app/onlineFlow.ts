@@ -1,7 +1,9 @@
 import { saveToken, storedToken } from "../net/identity.ts";
 import { downloadReplay, saveReplay } from "./replays.ts";
 import type * as THREE from "three";
-import { PROTOCOL_LIMITS, type MatchResult, type Replay, type ServerMsg } from "@re-tanx/sim";
+import { PROTOCOL_LIMITS, finalScore, type MatchResult, type Profile, type Replay, type ServerMsg, type World } from "@re-tanx/sim";
+import { showDebrief } from "./campaign/debrief.ts";
+import { recordWin } from "./campaign/progress.ts";
 import { forgetRejoin, rememberRejoin } from "./rejoin.ts";
 import { loadProfile } from "./profile/localProfile.ts";
 import { connect, serverUrl, type Socket } from "../net/socket.ts";
@@ -14,7 +16,7 @@ import type { Sfx } from "../audio/sfx.ts";
 
 interface Ctx { host: HTMLElement; renderer: THREE.WebGLRenderer; devices: Devices; sfx: Sfx; onExit(): void }
 
-const DEFAULT_SETTINGS = { mode: "deathmatch", scoreLimit: 0, bots: 2, difficulty: "normal", teams: "ffa", perks: false, map: "graybox", ranked: false, public: false } as const;
+const DEFAULT_SETTINGS = { mode: "deathmatch", scoreLimit: 0, bots: 2, difficulty: "normal", teams: "ffa", perks: true, map: "graybox", ranked: false, public: false } as const;
 
 /** Online menu → socket → lobby ⇄ match. Any connection problem lands back on the online menu with the reason. */
 export function startOnline(ctx: Ctx, error?: string): void {
@@ -37,6 +39,8 @@ async function go(ctx: Ctx, choice: OnlineChoice): Promise<void> {
   let match: OnlineMatch | undefined;
   let leaving = false;
   let progress: MatchResult | undefined;
+  let profile: Profile | undefined; // server copy, for the in-match XP strip
+  let upgrades = false; // lobby's "Upgrades" setting, for the V-level badges
   let replay: Replay | undefined;
   let inLobby = false;
   const leave = () => {
@@ -58,13 +62,17 @@ async function go(ctx: Ctx, choice: OnlineChoice): Promise<void> {
     if (m.t === "welcome") {
       myId = m.playerId;
       const token = storedToken();
-      sock.send({ t: "hello", name: choice.name, gang: choice.gang, perks: loadProfile().perks, ...(token ? { token } : {}) });
+      sock.send({ t: "hello", name: choice.name, gang: choice.gang, perks: loadProfile().perks, wingmen: loadProfile().wingmen, ...(loadProfile().oracle ? { oracle: loadProfile().oracle } : {}), ...(token ? { token } : {}) });
       sock.send(choice.rejoin ? { t: "rejoin", code: choice.rejoin } : choice.quick ? { t: "quick" } : choice.join ? { t: "join", code: choice.join } : { t: "create", settings: DEFAULT_SETTINGS });
     }
     if (m.t === "identity") {
       saveToken(m.token);
+      profile = m.profile;
     }
-    if (m.t === "progress") progress = m.result;
+    if (m.t === "progress") {
+      progress = m.result;
+      profile = m.result.profile;
+    }
     if (m.t === "replay") {
       replay = m.replay;
       saveReplay(replay); // watch it from the menu's "Watch last match" once you've left the lobby
@@ -81,10 +89,13 @@ async function go(ctx: Ctx, choice: OnlineChoice): Promise<void> {
       sock.close();
       startOnline(ctx, m.message);
     }
-    if (m.t === "lobby") code = m.code;
+    if (m.t === "lobby") {
+      code = m.code;
+      upgrades = m.settings.perks;
+    }
     if (m.t === "lobby" && !match) {
       inLobby = true;
-      showLobby(ctx.host, m, myId, { onSettings: (s) => sock.send({ t: "settings", settings: s }), onStart: () => sock.send({ t: "start" }), onLeave: leave });
+      showLobby(ctx.host, m, myId, { onSettings: (s) => sock.send({ t: "settings", settings: s }), onStart: () => sock.send({ t: "start" }), onLeave: leave, onTank: (kind) => sock.send({ t: "deploy", kind }) });
     }
     if (m.t === "start") {
       replay = undefined;
@@ -93,9 +104,14 @@ async function go(ctx: Ctx, choice: OnlineChoice): Promise<void> {
         onOver: (w) => {
           forgetRejoin();
           const r = replay;
+          if (w.campaign) return coopDebrief(ctx, w, progress, leave);
           showResults(ctx.host, w, { onRematch: () => {}, onMenu: leave, rematchLabel: "Back to lobby soon…", ...(progress ? { xp: progress } : {}), ...(r ? { replay: { download: () => downloadReplay(r) } } : {}) });
         },
         onLeave: leave,
+        profile,
+        upgrades,
+        mission: m.mission,
+        deploy: (kind) => sock.send({ t: "deploy", kind }),
       });
     }
     if (m.t === "ended") {
@@ -104,4 +120,11 @@ async function go(ctx: Ctx, choice: OnlineChoice): Promise<void> {
     }
     match?.onServer(m);
   };
+}
+
+/** Campaign co-op result: the mission debrief with your server XP; a win also moves your own campaign on (not your wallet). */
+function coopDebrief(ctx: Ctx, w: World, xp: MatchResult | undefined, leave: () => void): void {
+  const c = w.campaign!;
+  if (c.outcome === "won") recordWin(c.mission.id, finalScore(w).grade);
+  showDebrief(ctx.host, w, { onMenu: leave, menuLabel: "Leave · back to lobby soon…", ...(xp ? { xp } : {}) });
 }

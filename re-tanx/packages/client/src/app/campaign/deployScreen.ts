@@ -1,4 +1,6 @@
-import { isUnlocked, progressionDefs, tankDefs, tankKinds, type TankKind } from "@re-tanx/sim";
+import { deployCost, isUnlocked, levelFor, progressionDefs, tankDefs, tankKinds, type TankKind, type World } from "@re-tanx/sim";
+import type { LocalPlayer } from "../localPlayer.ts";
+import { loadProfile } from "../profile/localProfile.ts";
 import { names, tankName } from "@re-tanx/sim";
 
 const BLURB: Record<TankKind, string> = {
@@ -51,4 +53,23 @@ export function renderDeploy(el: HTMLElement, o: DeployOpts, onPick: (k: TankKin
     done = true;
     clearInterval(timer);
   };
+}
+
+/** Mid-mission: a dead player gets the deploy screen in their viewport (auto-picks after 8 s). `onPick` buys locally or asks the server. */
+export function redeployPrompt(lp: LocalPlayer, w: World, open: Map<number, () => void>, onPick: (k: TankKind) => void): void {
+  const c = w.campaign!;
+  const id = lp.tank.id;
+  const wrap = lp.hudRoot.querySelector<HTMLElement>(".deploy-wrap");
+  const needs = !lp.tank.alive && c.pendingDeploy[id] === undefined && c.outcome === "playing" && lp.tank.respawnIn <= 0.5;
+  if (!needs) {
+    if (wrap) wrap.remove();
+    open.get(id)?.();
+    open.delete(id);
+    return;
+  }
+  if (wrap) return;
+  const el = document.createElement("div");
+  el.className = "deploy-wrap";
+  lp.hudRoot.appendChild(el);
+  open.set(id, renderDeploy(el, { title: "Redeploy", bucks: c.bucks, cost: (k) => deployCost(c, k), autoSeconds: 8, preferred: lp.tank.kind, level: levelFor(loadProfile().xp).level }, onPick));
 }

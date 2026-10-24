@@ -10,10 +10,11 @@ Arcade model, not physics-sim. Kinematic controller with simple collision respon
 | Max forward speed | 16 m/s | 11 m/s | 7 m/s |
 | Reverse speed | 60% of forward | 50% | 45% |
 | Acceleration (0→max) | 0.6 s | 1.0 s | 1.6 s |
+| Braking (max→0, either direction) | 0.15 s | 0.25 s | 0.4 s |
 | Hull turn rate | 140°/s | 95°/s | 60°/s |
 | Turret turn rate | 220°/s | 160°/s | 110°/s |
 
-- **Tank-style steering**: left/right rotates hull in place or while moving; no strafing (except Hover class).
+- **Tank-style steering**: left/right rotates hull in place or while moving; no strafing (except Hover class). Steering keys ease into a full-rate turn over 0.2 s, like the original's analog stick, and stop the hull dead on release (`rules.json` `keySteerRamp`; sticks and touch are already analog). Braking is 4× acceleration (`brakeFactor`), so tanks stop instead of coasting.
 - **Collision**: slide along walls; ram damage = `mass_ratio × closing_speed × 2` above 6 m/s closing speed.
 - **Terrain**: flat-ish city grid; ramps/rubble allowed; tanks align to ground normal, no flipping.
 - **Hover class**: can strafe, ignores rubble/water slowdown, takes +25% damage.

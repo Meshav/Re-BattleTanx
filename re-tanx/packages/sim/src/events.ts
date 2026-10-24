@@ -6,7 +6,8 @@ export type SimEvent =
   | { type: "fire"; tankId: number; pos: Vec2; rot: number; weapon: string }
   | { type: "hit"; targetId: number; sourceId: number; amount: number; pos: Vec2 }
   | { type: "explode"; pos: Vec2; radius: number }
-  | { type: "kill"; victimId: number; killerId: number }
+  /** weapon: the special that did it (main gun, rams and burns have none) */
+  | { type: "kill"; victimId: number; killerId: number; weapon?: SpecialKind }
   | { type: "spawn"; tankId: number; pos: Vec2 }
   | { type: "structureStage"; structureId: number; stage: number; by?: number }
   | { type: "special"; tankId: number; kind: SpecialKind; super: boolean; pos: Vec2 }
