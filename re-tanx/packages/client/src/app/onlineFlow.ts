@@ -41,6 +41,7 @@ async function go(ctx: Ctx, choice: OnlineChoice): Promise<void> {
   let progress: MatchResult | undefined;
   let profile: Profile | undefined; // server copy, for the in-match XP strip
   let upgrades = false; // lobby's "Upgrades" setting, for the V-level badges
+  let pausable = false; // private, unranked lobby: the menu pauses the match
   let replay: Replay | undefined;
   let inLobby = false;
   const leave = () => {
@@ -92,6 +93,7 @@ async function go(ctx: Ctx, choice: OnlineChoice): Promise<void> {
     if (m.t === "lobby") {
       code = m.code;
       upgrades = m.settings.perks;
+      pausable = !m.settings.public && !m.settings.ranked;
     }
     if (m.t === "lobby" && !match) {
       inLobby = true;
@@ -112,6 +114,7 @@ async function go(ctx: Ctx, choice: OnlineChoice): Promise<void> {
         upgrades,
         mission: m.mission,
         deploy: (kind) => sock.send({ t: "deploy", kind }),
+        pausable,
       });
     }
     if (m.t === "ended") {

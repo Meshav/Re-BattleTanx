@@ -2,6 +2,7 @@ import { PROTOCOL_LIMITS, legalGang, legalOracle, legalPerks, parseClientMsg, ty
 import { send, type Client } from "./client.ts";
 import { rateLimited, pushInput } from "./match/inputs.ts";
 import { quickMatch } from "./lobby/quickMatch.ts";
+import { setPaused } from "./match/match.ts";
 import { createLobby, deployFor, joinLobby, leaveLobby, refreshMember, rejoinLobby, startLobby, updateSettings, type Lobbies } from "./lobby/lobbies.ts";
 
 /** Every inbound message goes through parseClientMsg (the trust boundary) before anything acts on it. */
@@ -38,6 +39,11 @@ function handle(ls: Lobbies, c: Client, msg: ClientMsg): void {
     case "deploy": return deployFor(ls, c, msg.kind);
     case "leave": return leaveLobby(ls, c);
     case "ping": return send(c, { t: "pong", at: msg.at });
+    case "pause": {
+      const l = c.lobby ? ls.byCode.get(c.lobby) : undefined;
+      if (l?.match && !l.settings.public && !l.settings.ranked && l.match.seats.some((s) => s.client === c)) setPaused(l.match, msg.on, c.name);
+      return;
+    }
     case "input": {
       const seat = c.lobby ? ls.byCode.get(c.lobby)?.match?.seats.find((s) => s.client === c) : undefined;
       if (seat) pushInput(seat.queue, msg.seq, msg.input, msg.view);

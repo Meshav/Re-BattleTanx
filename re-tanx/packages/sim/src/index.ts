@@ -20,7 +20,7 @@ export type { Pickup } from "./entities/pickup.ts";
 export { activeGuided } from "./weapons/guided.ts";
 export { modeKinds, modeRules } from "./modes/registry.ts";
 export type { ModeKind, ModeConfig, ModeState } from "./modes/mode.ts";
-export { difficulties, type Difficulty } from "./data/aiDefs.ts";
+export { aiDefs, difficulties, type Difficulty } from "./data/aiDefs.ts";
 export type { BotState } from "./ai/botState.ts";
 export { moveTank } from "./systems/stepMovement.ts";
 export { makeSnapshot, applySnapshot, structureStages, pickupsKey, type Snapshot, type SnapshotFor } from "./net/snapshot.ts";

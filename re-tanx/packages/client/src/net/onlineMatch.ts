@@ -7,7 +7,7 @@ import { updateTankView } from "../render/views/tankView.ts";
 import { updateChaseCam } from "../render/camera/chaseCam.ts";
 import { addShake, shakeOffset } from "../render/fx/shake.ts";
 import { hudEvents, updateHud } from "../hud/hud.ts";
-import { play, playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
+import { applyVolumes, play, playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
 import { redeployPrompt } from "../app/campaign/deployScreen.ts";
 import { createLiveProgress, liveProgressEvents, type LiveProgress } from "../hud/liveProgress.ts";
 import { startLoop } from "../loop.ts";
@@ -26,6 +26,8 @@ export interface OnlineHooks {
   onOver(w: World): void; onLeave(): void; profile: Profile | undefined; upgrades: boolean;
   /** campaign co-op: the mission id, and how to buy the next tank (asks the server) */
   mission?: string | undefined; deploy(k: TankKind): void;
+  /** private, unranked lobby: the menu pauses the match for everyone */
+  pausable: boolean;
 }
 
 export interface OnlineMatch { onServer(m: ServerMsg): void; stop(): void; /** the result screen is up (no point rejoining) */ over(): boolean }
@@ -45,7 +47,12 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
   const names = (id: number) => mirror.tanks.find((t) => t.id === id)?.name ?? "?";
   const pred = createPrediction();
   const shake = { amount: 0 };
-  const pause = createPauseMenu(host, { onQuit: () => { stop(); hooks.onLeave(); } }, "Menu", "Leave match");
+  let serverPaused = false;
+  const pause = createPauseMenu(host, {
+    onQuit: () => { stop(); hooks.onLeave(); },
+    onSettingsChange: () => applyVolumes(sfx),
+    onToggle: (open) => { if (hooks.pausable && open !== serverPaused) sock.send({ t: "pause", on: open }); },
+  }, hooks.pausable ? "Paused" : "Menu", "Leave match");
   let player: LocalPlayer | undefined;
   let live: LiveProgress | undefined;
   let snapPrev: Poses = new Map();
@@ -90,7 +97,7 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
 
   const stopLoop = startLoop(1 / rules.tickRate, {
     step() {
-      if (!player || mirror.mode.over) return;
+      if (!player || mirror.mode.over || serverPaused) return;
       const input = quantizeInput(pause.open ? idleInput(player.tank.turretRot) : readInput(player, devices, mirror));
       const seq = predict(pred, mirror, player.tank, input);
       // the tick other tanks are drawn at right now, so the server can rewind hitscan shots to what we saw
@@ -105,6 +112,7 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
       const snapAlpha = Math.min(1, (performance.now() - lastSnapAt) / SNAP_MS);
       renderWorld(view, mirror, snapPrev, snapAlpha, dt);
       netEl.textContent = `${Math.round(rtt)} ms`;
+      pause.render(mirror, player?.tank);
       if (!player) return;
       if (wantsCameraToggle(player, devices)) toggleCamera(player);
       const own = view.tanks.get(player.tank.id);
@@ -143,6 +151,11 @@ export function startOnlineMatch(sock: Socket, myTankId: number, mode: ModeKind,
       if (stopped) return;
       if (m.t === "snap") onSnap(m);
       if (m.t === "pong") rtt = performance.now() - m.at;
+      if (m.t === "paused") {
+        serverPaused = m.on;
+        if (pause.open !== m.on) pause.toggle();
+        if (m.on) pause.note(`Paused by ${m.by}`);
+      }
     },
     stop,
     over: () => mirror.mode.over,

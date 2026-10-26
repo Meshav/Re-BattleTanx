@@ -6,11 +6,11 @@ import { teamCss } from "../render/teamColors.ts";
 const SIZE = 180;
 
 /** Top-down radar: buildings, live pickups, tanks (original: radar always on in multiplayer). */
-export function drawMinimap(canvas: HTMLCanvasElement, world: World, me: Tank): void {
+export function drawMinimap(canvas: HTMLCanvasElement, world: World, me: Tank | undefined, size = SIZE): void {
   const g = canvas.getContext("2d");
   if (!g) return;
   const { cols, rows, cell } = world.map;
-  const s = SIZE / Math.max(cols, rows);
+  const s = size / Math.max(cols, rows);
   const width = Math.ceil(cols * s), height = Math.ceil(rows * s);
   if (canvas.width !== width) canvas.width = width;
   if (canvas.height !== height) canvas.height = height;

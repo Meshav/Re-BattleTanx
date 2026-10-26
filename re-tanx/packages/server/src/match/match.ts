@@ -12,7 +12,7 @@ const FULL_EVERY_TICKS = 30;
 interface Seat { client: Client | undefined; profileId: string | undefined; name: string; tankId: number; /** dropped connection: can reclaim the tank until this time (ms) */ awayUntil: number | undefined; queue: InputQueue; sentStages: string; sentPickups: string; full: boolean }
 
 /** One running game: a World, its seats, and a 30 Hz ticker. Nothing is shared between matches. */
-export interface Match { world: World; startedAt: number; ranked: boolean; customMap: MapJson | undefined; /** campaign co-op mission id */ mission?: string | undefined; seats: Seat[]; timer: NodeJS.Timeout | undefined; snapAcc: number; events: SimEvent[]; overAt: number; recorder: Recorder }
+export interface Match { world: World; startedAt: number; ranked: boolean; customMap: MapJson | undefined; /** campaign co-op mission id */ mission?: string | undefined; seats: Seat[]; /** private lobbies: frozen by a player's pause menu */ paused: boolean; timer: NodeJS.Timeout | undefined; snapAcc: number; events: SimEvent[]; overAt: number; recorder: Recorder }
 
 export function createMatch(map: MapJson, settings: LobbySettings, members: Client[]): Match {
   if (settings.mode === "campaign") return createCoopMission(settings, members);
@@ -26,7 +26,7 @@ export function createMatch(map: MapJson, settings: LobbySettings, members: Clie
   const world = createWorld(parseMap(map), slots, opts);
   world.lagComp = createLagComp();
   const seats = members.map((client, i) => ({ client, profileId: client.profileId, name: client.name, tankId: world.tanks[i]!.id, awayUntil: undefined, queue: createQueue(), sentStages: "", sentPickups: "", full: true }));
-  return { world, startedAt: Date.now(), ranked: settings.ranked, customMap: settings.customMap, seats, timer: undefined, snapAcc: 0, events: [], overAt: 0, recorder: createRecorder({ map: map.id, slots, opts, lagComp: true, ...(settings.customMap ? { customMap: settings.customMap } : {}) }, seats.length) };
+  return { world, startedAt: Date.now(), ranked: settings.ranked, customMap: settings.customMap, seats, paused: false, timer: undefined, snapAcc: 0, events: [], overAt: 0, recorder: createRecorder({ map: map.id, slots, opts, lagComp: true, ...(settings.customMap ? { customMap: settings.customMap } : {}) }, seats.length) };
 }
 
 /** Campaign co-op: the mission world (humans first, then the wingmen), recorded as a mission replay. */
@@ -35,7 +35,7 @@ function createCoopMission(settings: LobbySettings, members: Client[]): Match {
   const world = createMissionWorld({ ...setup, mission: missionById(setup.id)! });
   world.lagComp = createLagComp();
   const seats = members.map((client, i) => ({ client, profileId: client.profileId, name: client.name, tankId: world.tanks[i]!.id, awayUntil: undefined, queue: createQueue(), sentStages: "", sentPickups: "", full: true }));
-  return { world, startedAt: Date.now(), ranked: false, customMap: undefined, mission: setup.id, seats, timer: undefined, snapAcc: 0, events: [], overAt: 0, recorder: createRecorder({ map: "", slots: [], opts: {}, lagComp: true, mission: setup }, seats.length) };
+  return { world, startedAt: Date.now(), ranked: false, customMap: undefined, mission: setup.id, seats, paused: false, timer: undefined, snapAcc: 0, events: [], overAt: 0, recorder: createRecorder({ map: "", slots: [], opts: {}, lagComp: true, mission: setup }, seats.length) };
 }
 
 export function runMatch(m: Match, mapId: string, onEnd: () => void, onFinish: (m: Match) => void = () => {}): void {
@@ -45,6 +45,7 @@ export function runMatch(m: Match, mapId: string, onEnd: () => void, onFinish: (
 
 /** One server tick (exported for tests; runMatch drives it at 30 Hz). */
 export function tick(m: Match, onEnd: () => void, onFinish: (m: Match) => void): void {
+  if (m.paused) return;
   for (const s of m.seats) {
     if (s.client) m.world.inputs[s.tankId] = nextInput(s.queue);
     const view = s.client ? s.queue.view : undefined; // bots that took a seat shoot in the present
@@ -109,6 +110,13 @@ export function rejoinSeat(m: Match, client: Client, now = Date.now()): boolean 
   return true;
 }
 
+/** Freeze or resume the world for everyone (the caller checks the lobby is private). */
+export function setPaused(m: Match, on: boolean, by: string): void {
+  if (m.overAt || m.paused === on) return;
+  m.paused = on;
+  for (const s of m.seats) if (s.client) send(s.client, { t: "paused", on, by });
+}
+
 export function stopMatch(m: Match): void {
   if (m.timer) clearInterval(m.timer);
   m.timer = undefined;
@@ -116,4 +124,5 @@ export function stopMatch(m: Match): void {
 
 export function sendStart(m: Match, c: Client, tankId: number, mapId: string): void {
   send(c, { t: "start", mapId, tankId, seed: m.world.rng.state, mode: m.world.mode.kind, ...(m.customMap ? { map: m.customMap } : {}), ...(m.mission ? { mission: m.mission } : {}) });
+  if (m.paused) send(c, { t: "paused", on: true, by: "another player" }); // rejoined mid-pause
 }
