@@ -37,6 +37,7 @@ function capture(btn: HTMLButtonElement): void {
   btn.textContent = "press a key…";
   const onKey = (e: KeyboardEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // the bound key (or Esc) must not also reach the game, e.g. closing the pause menu
     window.removeEventListener("keydown", onKey, true);
     if (e.code !== "Escape") saveSettings({ ...settings(), bindings: { ...settings().bindings, [action]: e.code } });
     btn.textContent = keyName(settings().bindings[action]);

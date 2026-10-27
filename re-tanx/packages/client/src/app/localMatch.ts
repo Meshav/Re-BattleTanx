@@ -6,7 +6,7 @@ import { updateChaseCam } from "../render/camera/chaseCam.ts";
 import { addShake, shakeOffset } from "../render/fx/shake.ts";
 import { layoutViewports } from "../render/viewports.ts";
 import { hudEvents, updateHud } from "../hud/hud.ts";
-import { play, playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
+import { applyVolumes, play, playEvents, playMusic, updateEngine, type Sfx } from "../audio/sfx.ts";
 import { createLiveProgress, liveProgressEvents } from "../hud/liveProgress.ts";
 import { startLoop } from "../loop.ts";
 import { toSlots, type Device, type MatchConfig } from "./matchConfig.ts";
@@ -15,6 +15,7 @@ import { playerPose } from "../render/playerPose.ts";
 import type { Pose } from "../render/views/tankView.ts";
 import { cameraPose } from "./cameraPose.ts";
 import { createPauseMenu } from "./pauseMenu.ts";
+import { createDevPanel, devEnabled } from "./devPanel.ts";
 import { consumePress } from "../input/keyboard.ts";
 import { loadProfile } from "./profile/localProfile.ts";
 import { createTouch } from "../input/touch.ts";
@@ -63,7 +64,8 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
   const live = opts.playback ? undefined : createLiveProgress(players[0]!.hudRoot, loadProfile(), players[0]!.tank.id, world);
   if (live && players[0]!.tank.weaponXp) players[0]!.hud.weaponXp = live.tally.weaponXp; // badges only when upgrades are on
   const shake = { amount: 0 };
-  const pause = createPauseMenu(hudHost, { onQuit: () => { stop(); hooks.onQuit(); } });
+  const pause = createPauseMenu(hudHost, { onQuit: () => { stop(); hooks.onQuit(); }, onSettingsChange: () => applyVolumes(sfx) });
+  const dev = devEnabled() && !opts.playback ? createDevPanel(hudHost, world) : undefined;
   let prev = capturePoses(world);
   let overAt = 0;
   let padStartWas = false;
@@ -95,6 +97,7 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
       const start = anyPadStart();
       if (consumePress(devices.kb, "Escape") || (start && !padStartWas)) pause.toggle();
       padStartWas = start;
+      if (dev && consumePress(devices.kb, "F9")) dev.toggle();
       if (pause.open) alpha = 1;
       if (opts.playback) replayKeys();
       for (const p of players) if (wantsCameraToggle(p, devices)) toggleCamera(p);
@@ -103,6 +106,7 @@ export function runLocalWorld(world: World, deviceList: Device[], ctx: RunCtx, h
       renderWorld(view, world, prev, alpha, dt, poses);
       const sh = shakeOffset(shake, dt);
       for (const p of players) drawViewport(p, alpha, dt, sh, poses?.get(p.tank.id));
+      pause.render(world, players[0]?.tank);
       if (overAt && performance.now() - overAt > 2500) {
         stop();
         hooks.onOver(world);

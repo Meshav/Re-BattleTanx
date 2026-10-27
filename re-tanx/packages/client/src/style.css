@@ -73,6 +73,7 @@ button:disabled { opacity: .4; cursor: default; }
 .menu-logo img { display: block; width: 100%; height: auto; }
 .pause-heading { display: flex; align-items: center; gap: 14px; }
 .pause-heading img { width: 64px; height: auto; }
+.pause-map { justify-self: center; border-radius: 6px; border: 1px solid rgba(255,255,255,.15); }
 .start-menu button { min-height: 46px; }
 .start-menu button strong { font-size: 18px; }
 .play-now, .play-choices button { display: grid; gap: 5px; text-align: left; padding: 16px 18px; }
@@ -261,3 +262,11 @@ a { color: var(--accent); }
   .card.profile { padding: 18px; } .pf-hero { gap: 14px; } .pf-ring { flex-basis: 84px; height: 84px; } .pf-ring b { font-size: 30px; }
   .pf-id h1 { padding-right: 0; font-size: 20px; } .pf-back { top: -6px; min-height: 26px; padding: 2px 8px; }
 }
+.dev-panel { position: fixed; top: 12px; right: 12px; bottom: 12px; width: 360px; max-width: calc(100vw - 32px); display: flex; flex-direction: column; gap: 8px; padding: 12px; background: rgba(20,19,15,.94); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; pointer-events: auto; z-index: 20; font-size: 12px; }
+.dev-panel .row { display: flex; gap: 6px; align-items: center; justify-content: space-between; }
+.dev-panel input[data-filter] { flex: 1; min-width: 0; }
+.dev-rows { overflow: auto; display: grid; gap: 2px; }
+.dev-rows label { display: flex; justify-content: space-between; gap: 8px; }
+.dev-rows span { overflow-wrap: anywhere; }
+.dev-rows input { width: 84px; flex: none; }
+.dev-rows .dev-changed span { color: var(--accent); font-weight: bold; }

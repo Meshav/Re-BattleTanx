@@ -33,7 +33,9 @@ export type ClientMsg =
   | { t: "start" }
   | { t: "leave" }
   | { t: "input"; seq: number; input: InputState; /** server tick the client's screen showed (lag compensation) */ view?: number }
-  | { t: "ping"; at: number };
+  | { t: "ping"; at: number }
+  /** private lobbies only: pause / resume the running match for everyone */
+  | { t: "pause"; on: boolean };
 
 export type ServerMsg =
   | { t: "welcome"; playerId: number }
@@ -45,6 +47,7 @@ export type ServerMsg =
   | { t: "replay"; replay: Replay }
   | { t: "ended" }
   | { t: "error"; message: string }
-  | { t: "pong"; at: number };
+  | { t: "pong"; at: number }
+  | { t: "paused"; on: boolean; by: string };
 
 export const PROTOCOL_LIMITS = { maxMessageBytes: 4096, maxInputsPerSecond: 90, codeLength: 5, maxNameLength: 16, maxPlayers: 8, maxControlPerSecond: 20, maxLobbies: 500, rejoinGraceMs: 60_000 } as const;

@@ -79,6 +79,7 @@ export function parseClientMsg(raw: string): ClientMsg | undefined {
     case "start": case "leave": case "quick": return { t: o.t };
     case "input": return { t: "input", seq: Math.round(num(o.seq, 0, 2 ** 31)), input: sanitizeInput(o.input), ...(typeof o.view === "number" ? { view: Math.round(num(o.view, 0, 2 ** 31)) } : {}) };
     case "ping": return { t: "ping", at: num(o.at, 0, Number.MAX_SAFE_INTEGER) };
+    case "pause": return { t: "pause", on: o.on === true };
     default: return undefined;
   }
 }
